@@ -170,6 +170,7 @@ class SearchActionBox extends HTMLElement {
     constructor() {
         // Always call super first in constructor
         super();
+        this._componentName = 'Search Action Box';
         this._shadowRoot = this.attachShadow({mode: 'open'});
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
@@ -299,7 +300,7 @@ class SearchActionBox extends HTMLElement {
     }
 
     connectedCallback(){
-        console.log('connected!');
+        console.log(this._componentName+' connected!');
     }
 
     disconnectedCallback(){

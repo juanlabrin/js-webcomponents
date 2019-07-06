@@ -99,6 +99,12 @@ app.get('/:term/term-search', (req, res, next) => {
     });
 });
 
+app.get('/cargar-archivo', (req, res, next) => {
+    setTimeout(() => {
+        res.send({ success: true });
+    }, 3000);    
+});
+
 app.listen(port, () => {
     console.log(`Listen on port ${port}`);
 });

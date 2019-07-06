@@ -3,7 +3,11 @@ html
         meta(name='viewport', content='width=device-width, initial-scale=1.0')
         title=title
         script(type='module', src='./javascript/search-action-box.js')
+        script(type='module', src='./javascript/load-button.js')
     body
         h1=message
             div(style='width: 90%; padding: 15px;')
                 search-action-box
+            h2 Loading (ajax) Button
+            div(style='width: 150px; padding: 15px;')
+                load-button(url='/cargar-archivo')
