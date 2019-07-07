@@ -71,7 +71,7 @@ app.use(express.static(path.join(__dirname, 'public/')));
 app.get('/', (req, res) => {
     console.log(moneyFormatter.format(1000));
     console.log(moneyFormatter.locale(1000));
-    res.render('index', { title: 'Welcome to components', message: 'Components Prototypes' });
+    res.render('index', { title: 'Welcome to Web Components', message: 'Web Components Prototypes' });
 });
 
 app.get('/:sku/barcode-search', (req, res, next) => {

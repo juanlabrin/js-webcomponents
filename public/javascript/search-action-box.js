@@ -1,11 +1,8 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
-
     :host{
-        display: block;
-        font-family: sans-serif;
-        font-size: 12px;
+        font-family: 'Nunito', sans-serif;
     }
 
     input[type=text], input[type=number], select, textarea{
@@ -104,12 +101,18 @@ template.innerHTML = `
         border-bottom-right-radius: 0;
     }
 
-    .input-barcode{
-        background-color: #f0f8ff;
+    .input-group>.input-barcode{
+        background-color: #ffffe0;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-right: none !important;
     }
 
-    .input-autocomplete{
-        background-color: #ffffe0;
+    .input-group>.input-autocomplete{        
+        background-color: #f0f8ff;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+        border-right: none !important;
     }
 
     .input-display{
@@ -135,6 +138,9 @@ template.innerHTML = `
     .d-none{
         display: none;
     }
+    .icon{
+        height: 16px;
+    }
     
 </style>
 <div class="card">
@@ -143,13 +149,22 @@ template.innerHTML = `
     </div>
     <div class="card-body">
            
-        <div class="item-1"><input type="text" class="input-barcode" id="barcode-search" placeholder="Barcode Search" /></div>            
+        <div class="item-1">
+            <div class="input-group">                
+                <input type="text" class="input-barcode" id="barcode-search" placeholder="Barcode Search" /><span><img class="icon" src="./svg/barcode-solid.svg" /></span>
+            </div>
+        </div>            
         <div class="item-2">
-            <input type="text" class="input-autocomplete" id="autocomplete-search" list="products-list" placeholder="Autocomplete Search" />
-            <datalist id="products-list"></datalist>
+            <div class="input-group"> 
+                <input type="text" class="input-autocomplete" id="autocomplete-search" list="products-list" placeholder="Autocomplete Search" /><span><img class="icon" src="./svg/search-solid.svg" /></span>
+                <datalist id="products-list"></datalist>
+            </div>
         </div>
         <div class="item-3"><div class="info d-none">Dynamic Message...</div></div>
-        <div class="item-4"><input class="input-display" type="text" id="product-display" placeholder="Product Display" readonly /></div>
+        <div class="item-4">
+            <input class="input-display" type="text" id="product-display" placeholder="Product Display" readonly />
+            <input type="hidden" id="product-sku"> 
+        </div>
         <div class="item-5">
             <div class="input-group">
                 <input type="number" id="product-value" min="1" value="1" /><span>Value</span>
@@ -182,6 +197,7 @@ class SearchActionBox extends HTMLElement {
 
         this.$messageDisplay = this._shadowRoot.querySelector('.info');
 
+        this.$inputProductSku = this._shadowRoot.getElementById('product-sku');
         this.$inputProductValue = this._shadowRoot.getElementById('product-value');
         this.$inputProductQty = this._shadowRoot.getElementById('product-qty');
 
@@ -214,6 +230,7 @@ class SearchActionBox extends HTMLElement {
     _ajax(code, type){
 
         let productDisplay = this.$inputProductDisplay;
+        let productSku= this.$inputProductSku;
         let productValue = this.$inputProductValue;
         let productQty = this.$inputProductQty;
         let messageDisplay = (message, type, display) => this._message(message, type, display);
@@ -224,9 +241,13 @@ class SearchActionBox extends HTMLElement {
             })
             .then(function (json) {
                 if (json.success) {
+                    // console.log(json.product);
                     messageDisplay(null, null, false);
                     productDisplay.value = json.product.name;
+                    productSku.value = json.product.sku;
                     productValue.value = json.product.price;
+                    productQty.focus();
+                    productQty.select();
                 } else {
                     let message = 'Barcode: ' + code + ', Not found! Please try again...';
                     messageDisplay(message, 'info-danger', true);
@@ -235,19 +256,17 @@ class SearchActionBox extends HTMLElement {
                     productQty.value = 1;
                 }
                 // console.log(JSON.stringify(json));
-            }).catch(function(error){
-                console.error(error);
-            });
+            }).catch(error => console.error(error));
 
     }
 
     _barcodeSearch(e){
         if(this.$inputBarcodeSearch.value.length > 0){
             if(e.keyCode === 13){
-                // Implement AJAX Call
+                // AJAX Call
                 let barcode = this.$inputBarcodeSearch.value;
                 let type = 'barcode-search';
-                this._ajax(barcode, type);
+                this._ajax(barcode.toUpperCase(), type);
                 this.$inputBarcodeSearch.value = '';
             }
         }
@@ -257,7 +276,7 @@ class SearchActionBox extends HTMLElement {
         if(this.$inputAutocompleteSearch.value.length > 2){
             let term = this.$inputAutocompleteSearch.value;
             let productsList = this.$productsDataList;
-            // Implement AJAX Call
+            // AJAX Call
             fetch('/'+term+'/term-search')
                 .then(function(res){
                     return res.json();
@@ -290,10 +309,30 @@ class SearchActionBox extends HTMLElement {
         e.preventDefault();
         if (this.$inputProductDisplay.value.length > 0){
             //Implement Add to Order
-            alert(this.$inputProductDisplay.value + ' - ' + this.$inputProductValue.value + ' - ' + this.$inputProductQty.value);
+            var row = {
+                _id: this.$inputProductSku.value,
+                product: this.$inputProductDisplay.value,
+                price: this.$inputProductValue.value,
+                qty: this.$inputProductQty.value,
+                total: (Math.ceil(parseInt(this.$inputProductValue.value) * parseInt(this.$inputProductQty.value)).toString()),
+            };
+            console.log(row);
+
+            var data = this.$linkedTo.getAttribute('data');
+
+            if(data.length>0){
+                data = JSON.parse(this.$linkedTo.getAttribute('data'));
+                data.push(row);
+            } else {
+                data = [];
+                data.push(row);
+            }
+            this.$linkedTo.setAttribute('data', JSON.stringify(data));
+            // alert(this.$inputProductDisplay.value + ' - ' + this.$inputProductValue.value + ' - ' + this.$inputProductQty.value);
             this.$inputProductDisplay.value = '';
             this.$inputProductValue.value = 1;
             this.$inputProductQty.value = 1;
+            
         } else {
             this._message('You must does a search!', 'info-success', true);
         }        
@@ -301,13 +340,15 @@ class SearchActionBox extends HTMLElement {
 
     connectedCallback(){
         console.log(this._componentName+' connected!');
+        console.log('Linked to: ', this.getAttribute('link'));
+        this.$linkedTo = document.querySelector(this.getAttribute('link'));
     }
 
     disconnectedCallback(){
         console.log('disconnected!');
     }
 
-    attributeChangedCallback(){
+    attributeChangedCallback(name){
         console.log(`Attribute: ${name} changed!`);
     }
 

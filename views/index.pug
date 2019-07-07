@@ -2,12 +2,33 @@ html
     head
         meta(name='viewport', content='width=device-width, initial-scale=1.0')
         title=title
+        link(rel='stylesheet' href='./css/styles.css')
         script(type='module', src='./javascript/search-action-box.js')
+        script(type='module', src='./javascript/detail-dynamic-table.js')
         script(type='module', src='./javascript/load-button.js')
     body
-        h1=message
-            div(style='width: 90%; padding: 15px;')
-                search-action-box
-            h2 Loading (ajax) Button
-            div(style='width: 150px; padding: 15px;')
-                load-button(url='/cargar-archivo')
+        .container
+            h1=message
+                .grid-container
+                    .item1
+                        h2 Search / Action (ajax) Box
+                        div(style='padding: 15px;')
+                            search-action-box(link="detail-dynamic-table")
+                    .item2
+                        .note.info
+                            p Info! Some text...
+                    .item3
+                        h2 Detail Dynamic (mix) Table
+                        div(style='padding: 15px;')
+                            detail-dynamic-table(data="")
+                    .item4
+                        .note.info
+                            p Info! Some text...
+                    .item5
+                        h2 Loading (ajax) Button
+                        div(style='padding: 15px;')
+                            load-button(url='./javascript/data.json', link="detail-dynamic-table")
+                    
+                    .item6
+                        .note.info
+                            p Info! Some text...

@@ -1,0 +1,30 @@
+[
+    {
+        "_id": "PRO0001",
+        "product": "item1",
+        "price": "1500",
+        "qty": "10",
+        "total": "15000"
+    },
+    {
+        "_id": "PRO0002",
+        "product": "item2",
+        "price": "3600",
+        "qty": "8",
+        "total": "28800"
+    },
+    {
+        "_id": "PRO0003",
+        "product": "item3",
+        "price": "700",
+        "qty": "25",
+        "total": "17500"
+    },
+    {
+        "_id": "PRO0004",
+        "product": "item4",
+        "price": "3690",
+        "qty": "9",
+        "total": "33210"
+    }
+]
