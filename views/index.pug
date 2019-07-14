@@ -16,19 +16,26 @@ html
                             search-action-box(link="detail-dynamic-table")
                     .item2
                         .note.info
-                            p Info! Some text...
+                            h3 Info! Search Action Box.
+                            p The Search Action Box Web Component, is a small interface to get data from json endpoint in two ways:
+                            ol
+                                li Doing a barcode search and responsing with simple data showing in input area.
+                                li Make a autocomplete list search by entering more than 3 characters in the input field and responsing with a list of terms matches and is codes, doing a barcode search on selecting and showing the data in the input area.
+                            p The component has the hability too add the result in a dynamic data table linked to him by the "link" attribute.
                     .item3
                         h2 Detail Dynamic (mix) Table
                         div(style='padding: 15px;')
-                            detail-dynamic-table(data="")
+                            detail-dynamic-table
                     .item4
                         .note.info
-                            p Info! Some text...
+                            h3 Info! Detail Dynamic Table
+                            p  Some text...
                     .item5
                         h2 Loading (ajax) Button
                         div(style='padding: 15px;')
-                            load-button(url='./javascript/data.json', link="detail-dynamic-table")
+                            load-button(url='./js/data.json', link="detail-dynamic-table")
                     
                     .item6
                         .note.info
-                            p Info! Some text...
+                            h3 Info! Loading Button
+                            p Some text...

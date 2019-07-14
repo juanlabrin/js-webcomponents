@@ -156,8 +156,9 @@ template.innerHTML = `
         </div>            
         <div class="item-2">
             <div class="input-group"> 
-                <input type="text" class="input-autocomplete" id="autocomplete-search" list="products-list" placeholder="Autocomplete Search" /><span><img class="icon" src="./svg/search-solid.svg" /></span>
+                <input type="text" class="input-autocomplete" id="autocomplete-search" list="products-list" placeholder="Autocomplete Search" />
                 <datalist id="products-list"></datalist>
+                <span><img class="icon" src="./svg/search-solid.svg" /></span>
             </div>
         </div>
         <div class="item-3"><div class="info d-none">Dynamic Message...</div></div>
