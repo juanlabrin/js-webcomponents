@@ -11,7 +11,7 @@ const moneyFormatter = require('./money-formatter');
 const app = express();
 const port = 3000;
 
-const mongoDB = 'mongodb://localhost/demoMaestranza';
+const mongoDB = 'mongodb://localhost/emelpMaestranza';
 mongoose.connect(mongoDB, { useNewUrlParser: true, useCreateIndex: true });
 
 mongoose.Promise = global.Promise;
@@ -74,7 +74,7 @@ app.get('/', (req, res) => {
     res.render('index', { title: 'Welcome to Web Components', message: 'Web Components Prototypes' });
 });
 
-app.get('/:sku/barcode-search', (req, res, next) => {
+app.get('/:sku(*)/barcode-search', (req, res, next) => {
     Product.findOne({ sku: req.params.sku, active: true }, function (err, product) {
         if (err) console.error(err);
         console.log(product);

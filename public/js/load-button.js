@@ -64,7 +64,6 @@ class loadButton extends HTMLElement{
 
         this.$loadButton = this._shadowRoot.querySelector('button');
         this.$loader = this._shadowRoot.querySelector('.loader');
-
     }
 
     static get observedAttributes(){
@@ -87,6 +86,7 @@ class loadButton extends HTMLElement{
             this.$loadButton.textContent = 'Load file/data!';
         }, 5000);
     }
+
     _loadData(){
         this.$loadButton.classList.add('d-none');
         this.$loader.classList.remove('d-none');
@@ -125,7 +125,6 @@ class loadButton extends HTMLElement{
     connectedCallback() {
         console.log(this._componentName+' connected!');        
         this.$loadButton.addEventListener('click', this._loadData.bind(this));
-
         this.$linkedTo = document.querySelector(this.getAttribute('link'));
     }
 

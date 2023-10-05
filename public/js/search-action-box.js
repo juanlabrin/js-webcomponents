@@ -315,7 +315,7 @@ class SearchActionBox extends HTMLElement {
                 product: this.$inputProductDisplay.value,
                 price: this.$inputProductValue.value,
                 qty: this.$inputProductQty.value,
-                total: (Math.ceil(parseInt(this.$inputProductValue.value) * parseInt(this.$inputProductQty.value)).toString()),
+                total: (Math.ceil(parseFloat(this.$inputProductValue.value) * parseFloat(this.$inputProductQty.value)).toFixed(2)),
             };
             console.log(row);
 
