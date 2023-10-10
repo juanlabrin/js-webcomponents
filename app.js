@@ -21,7 +21,19 @@ app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public/')));
 
 let itemSchema = new mongoose.Schema({
-    sku: { type: String }
+    sku: { type: String, unique: true, required: true },    
+    description: { type: String, required: true },
+    cost: { type: Number, min: 0, required: true },
+    price: { type: Number, min: 0, required: true },
+    stock: { type: Number, min: 0, default: 0 },
+    barcode: { type: String, unique: true }
+});
+
+itemSchema.pre('save', function(next){
+    if(this.barcode == undefined){
+        this.barcode = this.sku.toUpperCase();
+    }
+    next();
 });
 
 let invoiceSchema = new mongoose.Schema({
@@ -32,9 +44,14 @@ let postSchema = new mongoose.Schema({
     title: { type: String }
 });
 
+let userSchema = new mongoose.Schema({
+    role: { type: String }
+});
+
 let Item = mongoose.model('items', itemSchema);
 let Invoice = mongoose.model('invoices', invoiceSchema);
 let Post = mongoose.model('posts', postSchema, 'post');
+let User = mongoose.model('users', postSchema);
 
 app.get('/', (req, res, next) => {
     res.render('index', { title: 'Vanilla Javascript Webcomponents' });
@@ -44,6 +61,18 @@ app.get('/dynamic-data-table', (req, res, next) => {
     res.render('ddt');
 });
 
+app.get('/item/create', async (req, res, next) => {
+    let newItem = new Item({
+        sku: 'test0002',
+        barcode: '0000000002',
+        description: 'Test 2 from js webcomponents',
+        cost: 100,
+        price: 200
+    });
+    let response = await newItem.save();
+    res.json({ response });
+});
+
 app.get('/items/list', async (req, res, next) => {
     let items = await Item.find({});
     res.json({ items: items });
@@ -51,12 +80,17 @@ app.get('/items/list', async (req, res, next) => {
 
 app.get('/invoices/list', async (req, res, next) => {
     let invoices = await Invoice.find({});
-    res.json({ invoices: invoices });
+    res.json({ success: true, invoices: invoices });
 });
 
 app.get('/posts/list', async (req, res, next) => {
-    let posts = await Post.find({});
-    res.json({ posts: posts });
+    let posts = await Post.find({}, 'title hashtags views category');
+    res.json({ posts });
+});
+
+app.get('/users/list', async (req, res, next) => {
+    let users = await User.find({ role: 1 });
+    res.json({ users });
 });
 
 app.listen(port, () => {
