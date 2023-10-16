@@ -54,24 +54,19 @@ class RichTextEditor extends HTMLElement {
 
         headersSelect.addEventListener('change', (e) => {
 
-            function hasHtmlTag(string) {
-                const htmlTagPattern = /<\/?[a-z][\s\S]*>/i;
-                return htmlTagPattern.test(string);
-            }
-
             if (headersSelect.value != '') {
-                const selection = window.getSelection();
-                const range = selection.getRangeAt(0);
+                // const selection = window.getSelection();
+                // const range = selection.getRangeAt(0);
 
-                console.log(range.toString());
+                // console.log(range.toString());
 
-                if (hasHtmlTag(range.toString())) {
-                    console.log(range.toString());
-                }
+                // if (hasHtmlTag(range.toString())) {
+                //     console.log(range.toString());
+                // }
 
-                const header = document.createElement(headersSelect.value);
-                range.surroundContents(header);
-                // document.execCommand('formatBlock', false, headersSelect.value);
+                // const header = document.createElement(headersSelect.value);
+                // range.surroundContents(header);
+                document.execCommand('formatBlock', false, headersSelect.value);
             }
         });
 
