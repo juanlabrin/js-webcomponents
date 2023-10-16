@@ -1,0 +1,13 @@
+html
+    head
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
+        title=title
+        link(rel='stylesheet' href='./css/styles.css')
+        script(type='module', src='./js/rich-text-editor/rich-text-editor.class.js')
+    body
+        .container 
+            h1=title
+            a(href="/") Home
+            .row 
+                .col-5 
+                    rich-text-editor

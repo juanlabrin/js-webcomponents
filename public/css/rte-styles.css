@@ -1,0 +1,36 @@
+.rte {
+    width: 100%;
+    height: 550px;
+    border: 2px solid #AAA;
+    position: relative;
+}
+
+.rte-header {
+    width: 100%;
+    height: 80px;
+    background-color: #e6e0e0;
+    position: relative;
+}
+
+.rte-body {
+    margin: 10px;
+    height: 409px;
+    border: 1px solid #CCC;
+    position: relative;
+}
+
+.rte-footer {
+    width: 100%;
+    height: 40px;
+    background-color: #e6e0e0;
+    position: relative;
+}
+
+.rte-editor-area {    
+    height: 98%;
+    margin: 5px;
+}
+
+.rte-editor-area:focus-visible {
+    outline: none;
+}

@@ -58,7 +58,11 @@ app.get('/', (req, res, next) => {
 });
 
 app.get('/dynamic-data-table', (req, res, next) => {
-    res.render('ddt');
+    res.render('ddt', { title: 'Dynamic Data Table' });
+});
+
+app.get('/rich-text-editor', (req, res, next) => {
+    res.render('rte', { title: 'Rich Text Editor' });
 });
 
 app.get('/item/create', async (req, res, next) => {
