@@ -37,12 +37,12 @@ class RichTextEditor extends HTMLElement {
     _drawToolsMenu() {
         const rteMenu = document.createElement('div');
 
-
         // Header Select Tool
         const headersSelect = document.createElement('select');
         const optionSelect = document.createElement('option');
-        optionSelect.value = '';
-        optionSelect.textContent = 'Header'
+
+        optionSelect.value = 'p';
+        optionSelect.textContent = 'Paragraph'
         headersSelect.appendChild(optionSelect);
 
         for (let i = 1; i < 7; i++) {
