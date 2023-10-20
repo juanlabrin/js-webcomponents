@@ -6,6 +6,6 @@
     <li>Rich Text Editor</li>
 </ul>
 <blockquote>
-Author: Juan Labrin
-Version: 1.0.0
+Author: Juan P. Labrin
+Version: 1.0.23
 </blockquote>
