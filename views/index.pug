@@ -1,15 +1,24 @@
-html 
-    head
-        meta(name='viewport', content='width=device-width, initial-scale=1.0')
-        title=title
-        link(rel='stylesheet' href='./css/styles.css')
-    body
-        .container
-            h1=title 
-            .row 
-                .col-6 
-                    ul 
-                        li
-                            a(href="dynamic-data-table") Dynamic Data Table
-                        li
-                            a(href="rich-text-editor") Rich Text Editor
+extends layout 
+
+block content
+        .container.mt-3
+            .card.mb-3
+                .card-body
+                    h1=title
+            .card.mb-3
+                .card-body
+                    nav 
+                        ul.nav.justify-content-center 
+                            li.nav-item
+                                a.nav-link(href="dynamic-data-table") Dynamic Data Table
+                            li.nav-item
+                                a.nav-link(href="dynamic-task-table") Dynamic Task Table
+                            li.nav-item
+                                a.nav-link(href="rich-text-editor") Rich Text Editor
+                            li.nav-item
+                                a.nav-link(href="action-button") Action Button 
+                            li.nav-item
+                                a.nav-link(href="search-action-box") Search Action Box 
+                            li.nav-item
+                                a.nav-link(href="timeline-task-box") Timeline Task Box
+                            

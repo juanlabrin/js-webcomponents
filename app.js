@@ -20,6 +20,12 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.static(path.join(__dirname, 'public/')));
 
+app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
+app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use('/css', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/css'));
+app.use('/js', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/js'));
+app.use('/webfonts', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/webfonts'));
+
 let itemSchema = new mongoose.Schema({
     sku: { type: String, unique: true, required: true },    
     description: { type: String, required: true },
