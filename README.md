@@ -4,6 +4,9 @@
     <li>Dynamic Data Table</li>
     <li>Dynamic Tasks Table</li>
     <li>Rich Text Editor</li>
+    <li>Action Button</li>
+    <li>Search Action Box</li>
+    <li>Timeline Task Box</li>
 </ul>
 <blockquote>
 Author: Juan P. Labrin
