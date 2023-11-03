@@ -26,6 +26,15 @@ class RichTextEditor extends HTMLElement {
         this.$rteFooter = this._shadowRoot.querySelector('.rte-footer');
 
         this.$editorArea = document.createElement('div');
+        this.$editorArea.addEventListener('keydown', this._appendParagraph.bind(this));
+    }
+
+    _appendParagraph(e) {
+        if (e.key === 'Enter') {
+            // e.preventDefault();
+            // let br = document.createElement('br');
+            // this.$editorArea.appendChild(br);
+        }
     }
 
     _drawTextEditorArea() {
@@ -55,18 +64,25 @@ class RichTextEditor extends HTMLElement {
         headersSelect.addEventListener('change', (e) => {
 
             if (headersSelect.value != '') {
-                // const selection = window.getSelection();
-                // const range = selection.getRangeAt(0);
+                // TODO set by range and NOT use execCommand...
+                // On enter inside the editor box avoid to add new div, append P (paragraph).
 
-                // console.log(range.toString());
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
 
+                console.log(range.toString());
+
+                // Regex function to determine if is a Html => TAG
+                // Not usefull...
                 // if (hasHtmlTag(range.toString())) {
                 //     console.log(range.toString());
                 // }
 
-                // const header = document.createElement(headersSelect.value);
-                // range.surroundContents(header);
-                document.execCommand('formatBlock', false, headersSelect.value);
+                const header = document.createElement(headersSelect.value);
+                range.surroundContents(header);
+
+                // document.execCommand('formatBlock', false, headersSelect.value);
+
             }
         });
 

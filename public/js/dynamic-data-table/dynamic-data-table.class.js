@@ -2,6 +2,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <link rel="stylesheet" href="./css/ddt-styles.css" />
+<div class="search-box"></div>
 <table></table>
 `;
 class DynamicDataTable extends HTMLElement {
@@ -16,6 +17,7 @@ class DynamicDataTable extends HTMLElement {
         this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
+        this.$searchBox = this._shadowRoot.querySelector('.search-box');
         this.$dynamicTable = this._shadowRoot.querySelector('table');
 
         this.$data;
@@ -30,6 +32,9 @@ class DynamicDataTable extends HTMLElement {
         this.$showSorting = false;
         this.$sortByColumn = 0;
         this.$sortType = 'asc';
+
+        this.$showSearching = false;
+        this.$searchQuery = '';
     }
 
     setOptions(options) {
@@ -40,6 +45,10 @@ class DynamicDataTable extends HTMLElement {
         }
     }
 
+    refresh(){
+        this._loadData(this.dataSource);
+    }
+
     _sortData(type, column, data) {
         // TODO Determine is Number
         if (type === 'asc') {
@@ -48,6 +57,11 @@ class DynamicDataTable extends HTMLElement {
             data.sort((a, b) => a[column] < b[column]);
         }
         return data;
+    }
+
+    _searchData(query){
+        let result = this.$data.filter((row) => row.description.match(query));
+        return result;
     }
 
     _drawPagination(currentPage) {
@@ -164,6 +178,40 @@ class DynamicDataTable extends HTMLElement {
     }
 
     _drawTable(page = 0) {
+        
+        // TODO Remove from here and add in the connectedCallback method
+        if(this.$showSearching){
+            console.log('Show searching');
+            let searchBox = document.createElement('div');
+            let inputQuery = document.createElement('input');
+            let btnSearch = document.createElement('button');
+
+            // I use bootstrap 5 
+            searchBox.classList.add('input-group');
+            inputQuery.classList.add('form-control');
+            btnSearch.classList.add('btn', 'btn-primary'),            
+            btnSearch.textContent = 'Search';
+
+            btnSearch.addEventListener('click', (e) => {
+                e.preventDefault(e);
+                if(inputQuery.value === ''){
+                    alert('Please fill the search input.');
+                    inputQuery.focus();
+                    return;
+                }
+                console.log(inputQuery.value);
+                // TODO write the search function/method
+                // Add result to temp data and draw the table
+                this.$data = this._searchData(inputQuery.value);
+                console.log(this.$data);
+                this._drawTable();
+            });
+
+            searchBox.appendChild(inputQuery);
+            searchBox.appendChild(btnSearch);
+            this.$searchBox.appendChild(searchBox);
+            
+        }
 
         if (this.$showSorting) {
             this.$data = this._sortData(this.$sortType, this.$columns[this.$sortByColumn], this.$data);
