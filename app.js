@@ -60,7 +60,7 @@ let Post = mongoose.model('posts', postSchema, 'post');
 let User = mongoose.model('users', postSchema);
 
 app.get('/', (req, res, next) => {
-    res.render('index', { title: 'Vanilla Javascript Webcomponents' });
+    res.render('index', { title: 'Vanilla Javascript - Webcomponents.' });
 });
 
 app.get('/dynamic-data-table', (req, res, next) => {
@@ -69,6 +69,10 @@ app.get('/dynamic-data-table', (req, res, next) => {
 
 app.get('/rich-text-editor', (req, res, next) => {
     res.render('rte', { title: 'Rich Text Editor' });
+});
+
+app.get('/timeline-task-box', (req, res, next) => {
+    res.render('ttb', { title: 'Timeline Task Box' });
 });
 
 app.get('/item/create', async (req, res, next) => {

@@ -1,0 +1,11 @@
+extends layout 
+
+block content 
+    script(type='module', src='./js/timeline-task-box/timeline-task-box.class.js')
+    .container.mt-3
+        .card.mb-3
+            .card-body 
+                h2 Timeline Task Box
+        .card.mb-3 
+            .card-body 
+                timeline-task-box(task-date="2023-11-24", task-title='Tarea de prueba, con texto largo sin wrap.')

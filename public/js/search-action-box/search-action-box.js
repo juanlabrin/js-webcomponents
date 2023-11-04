@@ -187,7 +187,7 @@ class SearchActionBox extends HTMLElement {
         // Always call super first in constructor
         super();
         this._componentName = 'Search Action Box';
-        this._shadowRoot = this.attachShadow({mode: 'open'});
+        this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
         // Declare objects inside Components
@@ -212,9 +212,9 @@ class SearchActionBox extends HTMLElement {
 
     }
 
-    _message(message, type, display = false){
+    _message(message, type, display = false) {
 
-        if(display){
+        if (display) {
             this.$messageDisplay.classList = '';
             this.$messageDisplay.classList.add('info');
             this.$messageDisplay.classList.add(type);
@@ -228,10 +228,10 @@ class SearchActionBox extends HTMLElement {
 
     }
 
-    _ajax(code, type){
+    _ajax(code, type) {
 
         let productDisplay = this.$inputProductDisplay;
-        let productSku= this.$inputProductSku;
+        let productSku = this.$inputProductSku;
         let productValue = this.$inputProductValue;
         let productQty = this.$inputProductQty;
         let messageDisplay = (message, type, display) => this._message(message, type, display);
@@ -261,9 +261,9 @@ class SearchActionBox extends HTMLElement {
 
     }
 
-    _barcodeSearch(e){
-        if(this.$inputBarcodeSearch.value.length > 0){
-            if(e.keyCode === 13){
+    _barcodeSearch(e) {
+        if (this.$inputBarcodeSearch.value.length > 0) {
+            if (e.keyCode === 13) {
                 // AJAX Call
                 let barcode = this.$inputBarcodeSearch.value;
                 let type = 'barcode-search';
@@ -273,16 +273,16 @@ class SearchActionBox extends HTMLElement {
         }
     }
 
-    _autocompleteSearch(e){
-        if(this.$inputAutocompleteSearch.value.length > 2){
+    _autocompleteSearch(e) {
+        if (this.$inputAutocompleteSearch.value.length > 2) {
             let term = this.$inputAutocompleteSearch.value;
             let productsList = this.$productsDataList;
             // AJAX Call
-            fetch('/'+term+'/term-search')
-                .then(function(res){
+            fetch('/' + term + '/term-search')
+                .then(function (res) {
                     return res.json();
                 })
-                .then(function(json){
+                .then(function (json) {
                     productsList.innerHTML = '';
                     json.forEach(element => {
                         let option = document.createElement('option');
@@ -294,7 +294,7 @@ class SearchActionBox extends HTMLElement {
         }
     }
 
-    _termSearch(e){
+    _termSearch(e) {
 
         let code = this.$inputAutocompleteSearch.value;
         let type = 'barcode-search';
@@ -306,9 +306,9 @@ class SearchActionBox extends HTMLElement {
 
     }
 
-    _addTo(e){
+    _addTo(e) {
         e.preventDefault();
-        if (this.$inputProductDisplay.value.length > 0){
+        if (this.$inputProductDisplay.value.length > 0) {
             //Implement Add to Order
             var row = {
                 _id: this.$inputProductSku.value,
@@ -321,7 +321,7 @@ class SearchActionBox extends HTMLElement {
 
             var data = this.$linkedTo.getAttribute('data');
 
-            if(data.length>0){
+            if (data.length > 0) {
                 data = JSON.parse(this.$linkedTo.getAttribute('data'));
                 data.push(row);
             } else {
@@ -333,27 +333,27 @@ class SearchActionBox extends HTMLElement {
             this.$inputProductDisplay.value = '';
             this.$inputProductValue.value = 1;
             this.$inputProductQty.value = 1;
-            
+
         } else {
             this._message('You must does a search!', 'info-success', true);
-        }        
+        }
     }
 
-    connectedCallback(){
-        console.log(this._componentName+' connected!');
+    connectedCallback() {
+        console.log(this._componentName + ' connected!');
         console.log('Linked to: ', this.getAttribute('link'));
         this.$linkedTo = document.querySelector(this.getAttribute('link'));
     }
 
-    disconnectedCallback(){
+    disconnectedCallback() {
         console.log('disconnected!');
     }
 
-    attributeChangedCallback(name){
+    attributeChangedCallback(name) {
         console.log(`Attribute: ${name} changed!`);
     }
 
-    adoptedCallback(){
+    adoptedCallback() {
         console.log('adopted!');
     }
 }
