@@ -1,7 +1,7 @@
 extends layout 
 
 block content
-    script(type='module', src='./js/dynamic-data-table/dynamic-data-table.class.js')
+    
     .container 
         h1=title
         a(href="/") Home
@@ -73,21 +73,22 @@ block content
                         img(src="images/ddt-no-datasource.png" width="100%")
             .col-5 
                 dynamic-data-table
+    script(type='module', src='/js/dynamic-data-table/dynamic-data-table.class.js')
     script.
         window.addEventListener('load', (e) => {
-            const ddtItems = document.getElementById('items-ddt');
-            const ddtInvoices = document.getElementById('invoices-ddt');
+            console.log('Page loaded');
+            var ddtItems = document.getElementById('items-ddt');
+            var ddtInvoices = document.getElementById('invoices-ddt');
 
             let optionsDDTItems = {                    
                 showSorting: true,
                 sortByColumn: 2,
                 showCaption: true,
                 showPagination: true,
-                showSearching: true,
                 rowsPerPage: 5,
                 columns: ['_id', 'itemType', 'sku', 'description', 'price', 'cost']
             }
-            ddtItems.setOptions(optionsDDTItems);
+            ddtItems.setAttribute('settings', JSON.stringify(optionsDDTItems));
 
             let optionsDDTInvoices = {
                 showId: true,

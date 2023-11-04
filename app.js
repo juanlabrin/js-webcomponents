@@ -63,6 +63,10 @@ app.get('/', (req, res, next) => {
     res.render('index', { title: 'Vanilla Javascript - Webcomponents.' });
 });
 
+app.get('/base-web-component', (req, res, next) => {
+    res.render('bwc', { title: 'Base Webcomponent' });
+});
+
 app.get('/dynamic-data-table', (req, res, next) => {
     res.render('ddt', { title: 'Dynamic Data Table' });
 });

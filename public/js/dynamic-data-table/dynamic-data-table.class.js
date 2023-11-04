@@ -326,10 +326,28 @@ class DynamicDataTable extends HTMLElement {
         this.setAttribute('data-source', url);
     }
 
+    get settings(){
+        return this.getAttribute('settings');
+    }
+
+    static get observedAttributes() {
+        return ['data-source', 'settings'];
+    }
+
     connectedCallback() {
         console.log(`${this._componentName} - ${this._componentVersion} connected!`);
         if (this.hasAttribute('data-source')) {
             this._loadData(this.dataSource);
+        }
+        if (this.hasAttribute('settings')) {
+            this._setOptions(this.settings);
+        }
+    }
+
+    attributeChangedCallback(attr){
+        console.log(attr);
+        if(attr === 'settings'){
+            this.setOptions(JSON.parse(this.settings));
         }
     }
 }
