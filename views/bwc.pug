@@ -8,4 +8,19 @@ block content
                 h2 Base WebComponent
         .card.mb-3 
             .card-body 
-                base-webcomponent
+                base-webcomponent#base-webcomponents
+    script.
+        const bwc = document.getElementById("base-webcomponents");   
+
+        let options = {
+            color: "#06f706",
+            background: "#7d7a7a",
+            padding: "25px"
+        }  
+
+        bwc.setAttribute('settings', JSON.stringify(options));   
+
+        window.addEventListener('load', ()=>{            
+            // bwc.setOptions('test');
+        });
+        

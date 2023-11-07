@@ -2,11 +2,13 @@ extends layout
 
 block content
     
-    .container 
-        h1=title
-        a(href="/") Home
+    .container
+        .card.mt-3
+            .card-body
+                h1=title
+                a(href="/") Home
         .row 
-            .col-10
+            .col-md-12
                 .note.info
                     h2 Dynamic Data Table WebComponent Description:
                     p This Dynamic Data Table Web Component is a versatile and customizable JavaScript-based solution for displaying data in a table format on your website. This web component is designed to be highly parameterized, allowing you to tailor the table's appearance and functionality to suit your specific needs. Here are some of its key features:
@@ -31,72 +33,75 @@ block content
                             Give your table a meaningful name or caption to provide context and enhance accessibility.
                     p This Dynamic Data Table Web Component is designed with simplicity and usability in mind. It's an excellent addition to any web application or website that requires the presentation of data in a structured and organized manner, with the added benefit of versatile data source options.
         h2 DDT - Examples
-        .row 
-            .col-5
+        .row.mb-3 
+            .col-md-5
                 .note.info
                         h3 Dynamic Data Table usage.
                         p With all options enabled except <strong>showId</strong> by default false & <strong>data-source</strong> attribute link.
                         img(src="images/ddt-items.png" width="100%")
                                                         
-            .col-5
+            .col-md-7
                 dynamic-data-table(data-source="/items/list" id="items-ddt")
         .row 
-            .col-5 
+            .col-md-5 
                 .note.info
                         h3 Dynamic Data Table usage. 
                         p With no options & only <strong>data-source</strong> attribute link.
                         img(src="images/ddt-posts.png" width="100%")
-            .col-5
+            .col-md-7
                 dynamic-data-table(data-source="/posts/list")
         .row 
-            .col-5 
+            .col-md-5 
                 .note.info
                         h3 Dynamic Data Table usage. 
                         p With <strong>showId, showPagination, rowsPerPage, showCaption & columns</strong> options settings & <strong>data-source</strong> attribute link.
                         img(src="images/ddt-invoices.png" width="100%")
-            .col-5 
+            .col-md-7
                 dynamic-data-table(data-source="/invoices/list" id="invoices-ddt")
                 
         .row 
-            .col-5 
+            .col-md-5 
                 .note.info
                         h3 Dynamic Data Table usage. 
                         p With no options & only <strong>data-source</strong> attribute link, whitout data response.
                         img(src="images/ddt-users.png" width="100%")
-            .col-5 
+            .col-md-7 
                 dynamic-data-table(data-source="/users/list")
         .row 
-            .col-5 
+            .col-md-5
                 .note.info
                         h3 Dynamic Data Table usage. 
                         p With no options & no <strong>data-source</strong> attribute link.
                         img(src="images/ddt-no-datasource.png" width="100%")
-            .col-5 
+            .col-md-7 
+                p Table instantiated but without attributes (not initializated)
                 dynamic-data-table
     script(type='module', src='/js/dynamic-data-table/dynamic-data-table.class.js')
     script.
-        window.addEventListener('load', (e) => {
-            console.log('Page loaded');
-            var ddtItems = document.getElementById('items-ddt');
-            var ddtInvoices = document.getElementById('invoices-ddt');
-
-            let optionsDDTItems = {                    
+        const ddtItems = document.getElementById('items-ddt');
+        let optionsDDTItems = {                    
                 showSorting: true,
                 sortByColumn: 2,
                 showCaption: true,
                 showPagination: true,
-                rowsPerPage: 5,
+                rowsPerPage: 10,
                 columns: ['_id', 'itemType', 'sku', 'description', 'price', 'cost']
             }
-            ddtItems.setAttribute('settings', JSON.stringify(optionsDDTItems));
+        ddtItems.setAttribute('settings', JSON.stringify(optionsDDTItems));
 
-            let optionsDDTInvoices = {
-                showId: true,
-                showPagination: true,
-                rowsPerPage: 10,
-                showCaption: true,
-                columns: ['_id', 'createdAt', 'invoiceId', 'total']
-            }
-            ddtInvoices.setOptions(optionsDDTInvoices);
+        const ddtInvoices = document.getElementById('invoices-ddt');     
+        let optionsDDTInvoices = {
+            showId: true,
+            showSorting: true,
+            sortByColumn: 2,
+            showPagination: true,
+            rowsPerPage: 10,
+            showCaption: true,
+            columns: ['_id', 'createdAt', 'invoiceId', 'total']
+        }
+        ddtInvoices.setAttribute('settings', JSON.stringify(optionsDDTInvoices));
+
+        window.addEventListener('load', (e) => {
+            console.log('Page loaded');
         });
         

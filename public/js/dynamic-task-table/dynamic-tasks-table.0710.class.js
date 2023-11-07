@@ -111,16 +111,6 @@ class DynamicTasksTable extends HTMLElement {
         this.$showId = false;
     }
 
-    _sortData(column, data){
-        let sort = 'desc';
-        if(typeof data[0][column] === 'number'){
-            data.sort((a, b) => a[column] - b[column]);
-        } else {
-            data.sort((a, b) => a[column].localeCompare(b[column]));
-        }
-        this._drawTable(data);
-    }
-
     _messageBoxClose() {
         this.$messageBox.innerHTML = '';
         this.$messageBox.classList.add('d-none');
@@ -401,14 +391,13 @@ class DynamicTasksTable extends HTMLElement {
             let title = this._shadowRoot.querySelector('#filter-title-text').value;
             let initDate = this._shadowRoot.querySelector('#filter-init-date').value;
             let percent = this._shadowRoot.querySelector('#filter-percent').value;
-            let status = this._shadowRoot.querySelector('#filter-select-status').value; 
-            let color = this._shadowRoot.querySelector('#filter-title-color').value;            
+            let status = this._shadowRoot.querySelector('#filter-select-status').value;
 
-            console.log('Set filter', title, initDate, percent, status, color);
+            console.log('Set filter', title, initDate, percent, status);
 
             let options = {
                 method: 'post',
-                body: JSON.stringify({ title: title, initDate: initDate, percent: percent, status: status, color: color }),
+                body: JSON.stringify({ title: title, initDate: initDate, percent: percent, status: status }),
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -529,7 +518,7 @@ class DynamicTasksTable extends HTMLElement {
     }
 
     _drawTable(data) {
-        console.log(data);
+        // console.log(data);
         this.$filterBox.innerHTML = '';
         this.$dynamicTable.innerHTML = '';
 
@@ -546,24 +535,9 @@ class DynamicTasksTable extends HTMLElement {
         const head = this.$dynamicTable.createTHead().insertRow(0);
 
         for (const column of this.$columns) {
-            let divHead = document.createElement('div');
             let strong = document.createElement('strong');
-
-            let icon = document.createElement('i');
-            icon.innerHTML = '&#x21c5;';
-            icon.style.cursor = 'pointer';
-            icon.style.marginLeft = '5px';
-
             strong.textContent = column.toUpperCase();
-
-            icon.addEventListener('click', (e) => {
-                e.preventDefault();
-                this._sortData(column, data);
-            });
-
-            divHead.appendChild(strong);
-            divHead.appendChild(icon);
-            head.insertCell().appendChild(divHead);
+            head.insertCell().appendChild(strong);
             // head.insertCell().innerHTML = `<strong>${column.toUpperCase()}</strong>`;
         }
 

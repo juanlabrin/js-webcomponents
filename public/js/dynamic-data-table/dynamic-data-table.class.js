@@ -1,4 +1,3 @@
-"use strict";
 const template = document.createElement('template');
 template.innerHTML = `
 <link rel="stylesheet" href="./css/ddt-styles.css" />
@@ -45,21 +44,28 @@ class DynamicDataTable extends HTMLElement {
         }
     }
 
-    refresh(){
+    refresh() {
         this._loadData(this.dataSource);
     }
 
     _sortData(type, column, data) {
-        // TODO Determine is Number
         if (type === 'asc') {
-            data.sort((a, b) => a[column] > b[column]);
+            if (typeof data[0][column] === 'number') {
+                data.sort((a, b) => a[column] - b[column]);
+            } else {
+                data.sort((a, b) => a[column].localeCompare(b[column]));
+            }
         } else {
-            data.sort((a, b) => a[column] < b[column]);
+            if (typeof data[0][column] === 'number') {
+                data.sort((a, b) => b[column] - a[column]);
+            } else {
+                data.sort((a, b) => b[column].localeCompare(a[column]));
+            }
         }
         return data;
     }
 
-    _searchData(query){
+    _searchData(query) {
         let result = this.$data.filter((row) => row.description.match(query));
         return result;
     }
@@ -153,6 +159,7 @@ class DynamicDataTable extends HTMLElement {
 
                 sortBtn.id = index;
                 sortBtn.classList.add('sort-btn');
+
                 if (index == this.$sortByColumn) {
                     sortBtn.classList.add('sorted');
                     sortBtn.classList.add(this.$sortType);
@@ -173,14 +180,14 @@ class DynamicDataTable extends HTMLElement {
                 thContent.appendChild(sortBtn);
                 thContent.classList.add('sorting');
                 object.appendChild(thContent);
-            })
+            });
         }
     }
 
     _drawTable(page = 0) {
-        
+
         // TODO Remove from here and add in the connectedCallback method
-        if(this.$showSearching){
+        if (this.$showSearching) {
             console.log('Show searching');
             let searchBox = document.createElement('div');
             let inputQuery = document.createElement('input');
@@ -189,12 +196,12 @@ class DynamicDataTable extends HTMLElement {
             // I use bootstrap 5 
             searchBox.classList.add('input-group');
             inputQuery.classList.add('form-control');
-            btnSearch.classList.add('btn', 'btn-primary'),            
-            btnSearch.textContent = 'Search';
+            btnSearch.classList.add('btn', 'btn-primary'),
+                btnSearch.textContent = 'Search';
 
             btnSearch.addEventListener('click', (e) => {
                 e.preventDefault(e);
-                if(inputQuery.value === ''){
+                if (inputQuery.value === '') {
                     alert('Please fill the search input.');
                     inputQuery.focus();
                     return;
@@ -210,7 +217,7 @@ class DynamicDataTable extends HTMLElement {
             searchBox.appendChild(inputQuery);
             searchBox.appendChild(btnSearch);
             this.$searchBox.appendChild(searchBox);
-            
+
         }
 
         if (this.$showSorting) {
@@ -242,7 +249,7 @@ class DynamicDataTable extends HTMLElement {
             }
 
         } else {
-            
+
             this.$dynamicTable.innerHTML = '';
 
             for (const index in this.$data) {
@@ -326,8 +333,12 @@ class DynamicDataTable extends HTMLElement {
         this.setAttribute('data-source', url);
     }
 
-    get settings(){
+    get settings() {
         return this.getAttribute('settings');
+    }
+
+    set settings(settings) {
+        this.setAttribute('settings', settings);
     }
 
     static get observedAttributes() {
@@ -340,13 +351,13 @@ class DynamicDataTable extends HTMLElement {
             this._loadData(this.dataSource);
         }
         if (this.hasAttribute('settings')) {
-            this._setOptions(this.settings);
+            this.setOptions(this.settings);
         }
     }
 
-    attributeChangedCallback(attr){
-        console.log(attr);
-        if(attr === 'settings'){
+    attributeChangedCallback(attr) {
+        if (attr === 'settings') {
+            // console.log(this.settings);
             this.setOptions(JSON.parse(this.settings));
         }
     }
