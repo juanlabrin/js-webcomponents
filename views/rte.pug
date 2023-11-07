@@ -2,9 +2,11 @@ extends layout
 
 block content
     script(type='module', src='./js/rich-text-editor/rich-text-editor.class.js')
-    .container 
-        h1=title
-        a(href="/") Home
-        .row 
-            .col-5 
+    .container.mt-3
+        .card.mb-3
+            .card-body 
+                h2 Base WebComponent
+        include navbar.pug
+        .card.mb-3 
+            .card-body
                 rich-text-editor
