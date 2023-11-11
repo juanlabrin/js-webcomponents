@@ -1,0 +1,20 @@
+extend ../layout
+block content 
+    .container.mt-3 
+        .card.mb-3 
+            .card-header 
+                h5=title
+            .card-body 
+                dynamic-data-table#items-ddt(data-source="/items/list")
+    script(type='module', src='/js/dynamic-data-table/dynamic-data-table.class.js')
+    script.
+        const ddtItems = document.getElementById('items-ddt');
+        let optionsDDTItems = {                    
+                showSorting: true,
+                sortByColumn: 2,
+                showCaption: true,
+                showPagination: true,
+                rowsPerPage: 10,
+                columns: ['_id', 'itemType', 'sku', 'description', 'price', 'cost']
+            }
+        ddtItems.setAttribute('settings', JSON.stringify(optionsDDTItems));

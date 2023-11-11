@@ -67,21 +67,26 @@ template.innerHTML = `
     <!-- <button type="button">Add/Remove Row Test</button> -->
 `;
 
-class DetailDynamicTable extends HTMLElement {
+class DynamicDataTable extends HTMLElement {
 
     constructor() {
         super();
         this._componentName = 'Detail Dynamic Table';
         this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
-
         this.$dynamicTable = this._shadowRoot.querySelector('table');
-        // this.$addRowButton = this._shadowRoot.querySelector('button');
-
-        this.$editIcon = `<img class="icon" src="./svg/edit-solid.svg" />`;
-        this.$delIcon = `<img class="icon" src="./svg/times-solid.svg" />`;
-
         this.$settings = [];
+    }
+
+    async __getData(url){
+        const response = await fetch(url);
+        const json = await response.json();
+        return json;
+    }
+
+    async __loadData(url){
+        let data = await this.__getData(url);
+        console.log(data);
     }
 
     _drawTable() {
@@ -223,48 +228,37 @@ class DetailDynamicTable extends HTMLElement {
 
     }
 
-    connectedCallback() {
-        console.log(this._componentName + ' connected!');
-        // this.$addRowButton.addEventListener('click', this._removeRow.bind(this));
-        if(this.hasAttribute('settings')){
-            this.$settings = JSON.parse(this.getAttribute('settings'));
-        }
-
-        if(this.hasAttribute('data')){
-            if (this.data.length > 0) {
-                this._drawTable();
-            }
-        } else {
-            this.data = [];
-            this._drawInitialSchema();
-        }
-
-        console.log(this.$settings);
-        
+    get dataSource() {
+        return this.getAttribute('data-source');
     }
 
-    get data() {
-        return this.getAttribute('data');
-    }
-
-    set data(newData) {
-        this.setAttribute('data', newData);
+    set dataSource(data) {
+        this.setAttribute('data-source', data);
     }
 
     static get observedAttributes() {
-        return ['data'];
+        return ['data-source'];
+    }
+
+    connectedCallback() {
+        console.log(this._componentName + ' connected!');
+
+        if(this.hasAttribute('settings')){
+            this.$settings = JSON.parse(this.getAttribute('settings'));
+            console.log(this.$settings);
+        }
+
+        if(this.hasAttribute('data-source')){
+            console.log(this.dataSource);
+            this.__loadData(this.dataSource);
+        } 
+        
     }
 
     attributeChangedCallback(name) {
-
         console.log(`Attribute: ${name} changed!`);
-        // console.log(this.data.length);
-        if (this.data.length > 0) {
-            this._drawTable();
-        }
-
     }
 
 }
 
-customElements.define('detail-dynamic-table', DetailDynamicTable);
+customElements.define('dynamic-data-table', DynamicDataTable);

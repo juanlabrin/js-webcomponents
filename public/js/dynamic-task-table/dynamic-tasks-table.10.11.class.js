@@ -106,41 +106,19 @@ class DynamicTasksTable extends HTMLElement {
         this.$messageBox = this._shadowRoot.querySelector('.alert');
         this.$filterBox = this._shadowRoot.querySelector('.filter-box-content');
 
-        this.$sortType = 'asc';
-
         this.$columns = [];
         this.$filterby = [];
         this.$showId = false;
     }
 
-    _sortData(type, column, data) {
-        if (type === 'asc') {
-            if (typeof data[0][column] === 'number') {
-                data.sort((a, b) => {
-                    return (a[column] === null) - (b[column] === null) || (a[column] - b[column]);
-                });
-            } else {
-                data.sort((a, b) => {
-                    return (a[column] === null) - (b[column] === null) || ('' + a[column]).localeCompare(b[column]);
-                });
-            }
-            this.$sortType = 'desc';
+    _sortData(column, data){
+        let sort = 'desc';
+        if(typeof data[0][column] === 'number'){
+            data.sort((a, b) => a[column] - b[column]);
+        } else {
+            data.sort((a, b) => a[column].localeCompare(b[column]));
         }
-        if (type === 'desc') {
-            if (typeof data[0][column] === 'number') {
-                data.sort((a, b) => {
-                    return (b[column] === null) - (a[column] === null) || (b[column] - a[column]);
-                });
-            } else {
-                data.sort((a, b) => {
-                    return (b[column] === null) - (a[column] === null) || ('' + b[column]).localeCompare(a[column]);
-                });
-            }
-            this.$sortType = 'asc';
-        }
-
         this._drawTable(data);
-
     }
 
     _messageBoxClose() {
@@ -260,7 +238,7 @@ class DynamicTasksTable extends HTMLElement {
             let dateInput = document.createElement('input');
             let btnSave = document.createElement('button');
 
-            dateInput.classList.add('form-control', type);
+            dateInput.classList.add('form-control');
             dateInput.type = 'date';
             dateInput.value = (data[type]) ? this._formatDate(null, data[type]) : '';
 
@@ -268,32 +246,26 @@ class DynamicTasksTable extends HTMLElement {
             btnSave.style.marginLeft = '3px';
             btnSave.innerHTML = '<i class="fas fa-save"></i><span class="tooltip-text">Save</span>';
 
-            let currentDate = dateInput.value;
+            let previousDate = dateInput.value;
 
             dateInput.addEventListener('change', (e) => {
+                // console.log('Change the task initDate ' + dateInput.value);
+                const currentDate = dateInput.value;
 
-                console.log(currentDate);
-                if (type === 'limitDate') {
-                    if (new Date(dateInput.value) < new Date(data['initDate'])) {
-                        console.log(new Date(dateInput.value), ' less than ', new Date(data['initDate']));
+                if (currentDate !== previousDate) {
+                    // console.log('Date changed with date picker:', currentDate);
+                    previousDate = currentDate;
+                    if (type === 'limitDate' && currentDate < data['initDate']) {
                         alert('Limit date cannot be less than Init date');
-                        dateInput.value = currentDate;
                         return;
                     }
-                }
-
-                if (type === 'initDate' && !!data['limitDate']) {
-                    console.log(data['limitDate']);
-                    if (new Date(dateInput.value) > new Date(data['limitDate'])) {
-                        console.log(new Date(dateInput.value), ' higher than ', new Date(data['limitDate']));
+                    if (type === 'initDate' && currentDate > data['limitDate']) {
                         alert('Init date cannot be higher than Limit date');
-                        dateInput.value = currentDate;
                         return;
                     }
+                    btnSave.classList.remove('d-none');
+                    // btnSave.classList.add('tooltip');
                 }
-
-                currentDate = dateInput.value;
-                btnSave.classList.remove('d-none');
 
             });
 
@@ -429,8 +401,8 @@ class DynamicTasksTable extends HTMLElement {
             let title = this._shadowRoot.querySelector('#filter-title-text').value;
             let initDate = this._shadowRoot.querySelector('#filter-init-date').value;
             let percent = this._shadowRoot.querySelector('#filter-percent').value;
-            let status = this._shadowRoot.querySelector('#filter-select-status').value;
-            let color = this._shadowRoot.querySelector('#filter-title-color').value;
+            let status = this._shadowRoot.querySelector('#filter-select-status').value; 
+            let color = this._shadowRoot.querySelector('#filter-title-color').value;            
 
             console.log('Set filter', title, initDate, percent, status, color);
 
@@ -557,7 +529,7 @@ class DynamicTasksTable extends HTMLElement {
     }
 
     _drawTable(data) {
-        // console.log(data);
+        console.log(data);
         this.$filterBox.innerHTML = '';
         this.$dynamicTable.innerHTML = '';
 
@@ -586,7 +558,7 @@ class DynamicTasksTable extends HTMLElement {
 
             icon.addEventListener('click', (e) => {
                 e.preventDefault();
-                this._sortData(this.$sortType, column, data);
+                this._sortData(column, data);
             });
 
             divHead.appendChild(strong);

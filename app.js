@@ -14,7 +14,7 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', console.log.bind(console, 'Connection to MongoDB Succesfully!'));
 
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/lab/')]);
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
@@ -50,6 +50,10 @@ let postSchema = new mongoose.Schema({
     title: { type: String }
 });
 
+let taskSchema = new mongoose.Schema({
+    initDate: { type: String }
+});
+
 let userSchema = new mongoose.Schema({
     role: { type: String }
 });
@@ -57,10 +61,15 @@ let userSchema = new mongoose.Schema({
 let Item = mongoose.model('items', itemSchema);
 let Invoice = mongoose.model('invoices', invoiceSchema);
 let Post = mongoose.model('posts', postSchema, 'post');
-let User = mongoose.model('users', postSchema);
+let Task = mongoose.model('tasks', taskSchema);
+let User = mongoose.model('users', userSchema);
 
 app.get('/', (req, res, next) => {
     res.render('index', { title: 'Vanilla Javascript - Webcomponents.' });
+});
+
+app.get('/test', (req, res, next) => {
+    res.render('test', { title: 'Vanilla Javascript - Test Area.' });
 });
 
 app.get('/base-web-component', (req, res, next) => {
@@ -68,7 +77,11 @@ app.get('/base-web-component', (req, res, next) => {
 });
 
 app.get('/dynamic-data-table', (req, res, next) => {
-    res.render('ddt', { title: 'Dynamic Data Table' });
+    res.render('dynamic-data-table', { title: 'Dynamic Data Table' });
+});
+
+app.get('/dynamic-data-table/lab', (req, res, next) => {
+    res.render('dynamic-data-table-lab', { title: 'Dynamic Data Table {lab}' });
 });
 
 app.get('/rich-text-editor', (req, res, next) => {
@@ -104,6 +117,11 @@ app.get('/invoices/list', async (req, res, next) => {
 app.get('/posts/list', async (req, res, next) => {
     let posts = await Post.find({}, 'title hashtags views category');
     res.json({ posts });
+});
+
+app.get('/tasks/list', async (req, res, next) => {
+    let tasks = await Task.find({}, 'title hashtags views category');
+    res.json({ success: true, tasks: tasks });
 });
 
 app.get('/users/list', async (req, res, next) => {

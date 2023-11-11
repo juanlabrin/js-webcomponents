@@ -1,8 +1,14 @@
 const template = document.createElement('template');
 template.innerHTML = `
-<link rel="stylesheet" href="./css/ddt-styles.css" />
+<style>
+/* @import "/css/ddt-styles.css"; */
+@import "/css/bootstrap.min.css";
+* {
+    font-size: 12px;
+}
+</style>
 <div class="search-box"></div>
-<table></table>
+<table class="table table-sm table-striped"></table>
 `;
 class DynamicDataTable extends HTMLElement {
     constructor() {
@@ -55,12 +61,15 @@ class DynamicDataTable extends HTMLElement {
             } else {
                 data.sort((a, b) => a[column].localeCompare(b[column]));
             }
-        } else {
+            this.$sortType = "desc";
+        } 
+        if (type === 'desc') {
             if (typeof data[0][column] === 'number') {
                 data.sort((a, b) => b[column] - a[column]);
             } else {
                 data.sort((a, b) => b[column].localeCompare(a[column]));
             }
+            this.$sortType = "asc";
         }
         return data;
     }
@@ -122,8 +131,36 @@ class DynamicDataTable extends HTMLElement {
         tFoot.cells[0].appendChild(pagesContainer);
     }
 
+    _drawSortingIcons(tHead) {
+        if (tHead.childNodes.length > 0) {
+            tHead.childNodes.forEach((object, index) => {
+
+                let icon = document.createElement('i');
+                // icon.innerHTML = '&#x21c5;';
+                icon.innerHTML = '&#x296E;';                
+                icon.style.opacity = '0.5';
+                icon.style.cursor = 'pointer';
+                icon.style.marginLeft = '5px';
+
+                if (index === this.$sortByColumn) {
+                    icon.style.opacity = '1';
+                }
+
+                icon.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // console.log(index);
+                    this.$sortByColumn = index;
+                    this._drawTable()
+                });
+
+                object.appendChild(icon);
+            });
+        }
+    }
+
     _drawSorting(tHead) {
         if (tHead.childNodes.length > 0) {
+
             tHead.childNodes.forEach((object, index) => {
 
                 let thContent = document.createElement('div');
@@ -180,7 +217,9 @@ class DynamicDataTable extends HTMLElement {
                 thContent.appendChild(sortBtn);
                 thContent.classList.add('sorting');
                 object.appendChild(thContent);
+
             });
+
         }
     }
 
@@ -296,7 +335,8 @@ class DynamicDataTable extends HTMLElement {
         }
 
         if (this.$showSorting) {
-            this._drawSorting(tHead);
+            // this._drawSorting(tHead);
+            this._drawSortingIcons(tHead);
         }
     }
 
