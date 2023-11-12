@@ -51,7 +51,11 @@ let postSchema = new mongoose.Schema({
 });
 
 let taskSchema = new mongoose.Schema({
-    initDate: { type: String }
+    title: { type: String, required: true }
+});
+
+let projectSchema = new mongoose.Schema({
+    title: { type: String, required: true, maxlength: 120 }
 });
 
 let userSchema = new mongoose.Schema({
@@ -62,6 +66,7 @@ let Item = mongoose.model('items', itemSchema);
 let Invoice = mongoose.model('invoices', invoiceSchema);
 let Post = mongoose.model('posts', postSchema, 'post');
 let Task = mongoose.model('tasks', taskSchema);
+let Project = mongoose.model('projects', projectSchema);
 let User = mongoose.model('users', userSchema);
 
 app.get('/', (req, res, next) => {
@@ -120,7 +125,7 @@ app.get('/posts/list', async (req, res, next) => {
 });
 
 app.get('/tasks/list', async (req, res, next) => {
-    let tasks = await Task.find({}, 'title hashtags views category');
+    let tasks = await Task.find({}, 'title initDate limitDate projectId taskColor');
     res.json({ success: true, tasks: tasks });
 });
 

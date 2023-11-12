@@ -62,7 +62,7 @@ class DynamicDataTable extends HTMLElement {
                 data.sort((a, b) => a[column].localeCompare(b[column]));
             }
             this.$sortType = "desc";
-        } 
+        }
         if (type === 'desc') {
             if (typeof data[0][column] === 'number') {
                 data.sort((a, b) => b[column] - a[column]);
@@ -75,7 +75,7 @@ class DynamicDataTable extends HTMLElement {
     }
 
     _searchData(query) {
-        let result = this.$data.filter((row) => row.description.match(query));
+        let result = this.$data.filter((row) => row.description.match(new RegExp(query)));
         return result;
     }
 
@@ -137,7 +137,7 @@ class DynamicDataTable extends HTMLElement {
 
                 let icon = document.createElement('i');
                 // icon.innerHTML = '&#x21c5;';
-                icon.innerHTML = '&#x296E;';                
+                icon.innerHTML = '&#x296E;';
                 icon.style.opacity = '0.5';
                 icon.style.cursor = 'pointer';
                 icon.style.marginLeft = '5px';
@@ -228,6 +228,7 @@ class DynamicDataTable extends HTMLElement {
         // TODO Remove from here and add in the connectedCallback method
         if (this.$showSearching) {
             console.log('Show searching');
+            this.$searchBox.innerHTML = '';
             let searchBox = document.createElement('div');
             let inputQuery = document.createElement('input');
             let btnSearch = document.createElement('button');
@@ -235,8 +236,8 @@ class DynamicDataTable extends HTMLElement {
             // I use bootstrap 5 
             searchBox.classList.add('input-group');
             inputQuery.classList.add('form-control');
-            btnSearch.classList.add('btn', 'btn-primary'),
-                btnSearch.textContent = 'Search';
+            btnSearch.classList.add('btn', 'btn-primary');
+            btnSearch.textContent = 'Search';
 
             btnSearch.addEventListener('click', (e) => {
                 e.preventDefault(e);
@@ -395,8 +396,8 @@ class DynamicDataTable extends HTMLElement {
         }
     }
 
-    attributeChangedCallback(attr) {
-        if (attr === 'settings') {
+    attributeChangedCallback(name) {
+        if (name === 'settings') {
             // console.log(this.settings);
             this.setOptions(JSON.parse(this.settings));
         }
