@@ -31,8 +31,10 @@ template.innerHTML = `
 .timeline-grid {
     display: grid;
     grid-template: "timeline-grid";
-    place-content: baseline;
+    place-content: unset;
     place-items: center;
+    width: -moz-available;
+    width: -webkit-fill-available;
     overflow: hidden;
 }
 
@@ -84,6 +86,33 @@ template.innerHTML = `
     color: #fff;
 }
 
+.task .status-badge {
+    float: inline-end;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    margin: 0.1rem;
+    border-radius: 0.25rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.status-badge-created {
+    background-color: #0087ff;
+}
+
+.status-badge-completed {
+    background-color: #08b703;
+}
+
+.status-badge-inprocess {
+    background-color: #b7a303;
+}
+
+.status-badge-notset {
+    background-color: #aaa;
+}
+
 </style>
     <div class="timeline-container">
         <div class="arrow prev-day">prev</div>
@@ -130,7 +159,7 @@ class TimelineTaskBox extends HTMLElement {
     }
 
     _drawTimeline(tasks, week) {
-        // console.log(tasks, week);
+        console.log(tasks, week);
 
         this.$weekGrid.innerHTML = '';
         this.$tasksGrid.innerHTML = '';
@@ -142,25 +171,59 @@ class TimelineTaskBox extends HTMLElement {
             this.$weekGrid.appendChild(day);
         });
 
-        tasks.forEach(t => {
+        if (tasks.length > 0) {
+            tasks.forEach(t => {
+                let task = document.createElement('div');
+                let taskTitle = document.createElement('span');
+                let taskStatus = document.createElement('span');
+
+                task.classList.add('task');
+                task.style.gridColumnStart = t.lineStart;
+                task.style.gridColumnEnd = t.lineEnd;
+                task.style.backgroundColor = t.task.taskColor;
+
+
+                taskStatus.classList.add('status-badge');
+                (t.task.status === 'CREATED') ? taskStatus.classList.add('status-badge-created') : '';
+                (t.task.status === 'COMPLETED') ? taskStatus.classList.add('status-badge-completed') : '';
+                (t.task.status === 'IN PROCESS') ? taskStatus.classList.add('status-badge-inprocess') : '';
+                (t.task.status === 'NOT SET') ? taskStatus.classList.add('status-badge-notset') : '';
+
+                taskTitle.textContent = t.task.title;
+                taskStatus.textContent = t.task.status;
+
+                task.appendChild(taskTitle);
+                task.appendChild(taskStatus);
+                this.$tasksGrid.append(task);
+            });
+        } else {
             let task = document.createElement('div');
+            let taskTitle = document.createElement('span');
+            let taskStatus = document.createElement('span');
+
             task.classList.add('task');
-            task.style.gridColumnStart = t.lineStart;
-            task.style.gridColumnEnd = t.lineEnd;
-            task.style.backgroundColor = t.task.taskColor;
-            task.textContent = t.task.title;
+            task.style.gridColumnStart = 1;
+            task.style.gridColumnEnd = 8;
+
+            taskTitle.textContent = "Test";
+            taskStatus.textContent = "Test";
+
+            task.appendChild(taskTitle);
+            task.appendChild(taskStatus);
             this.$tasksGrid.append(task);
-        });
+        }
+
 
     }
 
-    _setPrevNextArrows(date, currentWeek){
+    _setPrevNextArrows(currentWeek) {
         this.$prevDay.innerHTML = '';
         this.$nextDay.innerHTML = '';
-        let currentDate = new Date(date);
 
-        let prevDay = currentDate.setDate(currentWeek[0].getDate() - 1);
-        let nextDay = currentDate.setDate(currentWeek[6].getDate() + 1);
+        let prevDay = currentWeek[0].getTime() - (24 * 60 * 60 * 1000);
+        let nextDay = currentWeek[6].getTime() + (24 * 60 * 60 * 1000);
+
+        // console.log(new Date(prevDay), new Date(nextDay));
 
         let btnPrevDay = document.createElement('button');
         btnPrevDay.setAttribute('rel', prevDay);
@@ -174,34 +237,51 @@ class TimelineTaskBox extends HTMLElement {
         btnNextDay.addEventListener('click', (e) => { this._proccesData(new Date(nextDay), this.$data); });
         this.$nextDay.appendChild(btnNextDay);
 
-        // console.log(new Date(prevDay), new Date(nextDay));
+    }
+
+
+
+    _formatDate(string) {
+        let date = new Date(string);
+        function addZero(int) {
+            if (int < 10) {
+                return '0' + int;
+            } else {
+                return int;
+            }
+        }
+        date = `${date.getUTCFullYear()}${addZero(parseInt(date.getUTCMonth() + 1))}${addZero(parseInt(date.getUTCDate()))}`
+        return date;
     }
 
     _proccesData(date, data) {
         let currentWeek = this._getWeekDates(date);
         let tasksInCurrentWeek = [];
-        data.forEach(task => {
-            let indexStart = currentWeek.findIndex((date) => date.getUTCDate() == new Date(task.initDate).getUTCDate());
+
+        for (const task of data) {
+            let indexStart = currentWeek.findIndex((date) => this._formatDate(date.toUTCString()) === this._formatDate(task.initDate));
             if (indexStart != -1) {
                 indexStart = indexStart + 1;
                 let indexEnd = indexStart + 1;
                 if (task.limitDate != null) {
-                    indexEnd = currentWeek.findIndex((date) => date.getUTCDate() == new Date(task.limitDate).getUTCDate())
+                    indexEnd = currentWeek.findIndex((date) => this._formatDate(date.toUTCString()) === this._formatDate(task.limitDate));
                     if (indexEnd != -1) {
                         indexEnd = indexEnd + 2;
                     }
                 }
                 tasksInCurrentWeek.push({ lineStart: indexStart, lineEnd: indexEnd, task: task });
             }
-        });
+        }
+
         this._drawTimeline(tasksInCurrentWeek, currentWeek);
-        this._setPrevNextArrows(date, currentWeek);
+        this._setPrevNextArrows(currentWeek);
     }
 
     async _loadData(dataSource) {
         let response = await this._getData(dataSource);
         if (response.success) {
-            this.$data = response.tasks;
+            ;
+            this.$data = response.data;
             this._proccesData(this.$date, this.$data);
         }
     }
@@ -212,6 +292,10 @@ class TimelineTaskBox extends HTMLElement {
 
     set dataSource(dataSource) {
         this.setAttribute('data-source', dataSource);
+    }
+
+    refresh() {
+        this._loadData(this.dataSource);
     }
 
     connectedCallback() {

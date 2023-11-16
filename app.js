@@ -125,8 +125,8 @@ app.get('/posts/list', async (req, res, next) => {
 });
 
 app.get('/tasks/list', async (req, res, next) => {
-    let tasks = await Task.find({}, 'title initDate limitDate projectId taskColor');
-    res.json({ success: true, tasks: tasks });
+    let tasks = await Task.find({}, 'title initDate limitDate projectId taskColor status');
+    res.json({ success: true, data: tasks });
 });
 
 app.get('/users/list', async (req, res, next) => {
