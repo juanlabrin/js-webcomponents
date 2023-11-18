@@ -1,6 +1,31 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.timeline-month-name {
+    padding: 0.25rem;
+    margin: 0;    
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: gray;
+}
+
+.weeks-with-tasks {
+    display: block;
+    font-size: .95rem;
+    line-height: 1.5;
+    appearance: auto;
+    border: 1px solid lightgray;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    margin-bottom: 0.25rem;
+    color: gray;
+}
+
 .timeline-container {
     display: flex;
     padding: 10px;
@@ -114,6 +139,11 @@ template.innerHTML = `
 }
 
 </style>
+<div class="wrap">
+    <div class="timeline-header">
+        <h5 class="timeline-month-name">{Month Name}</h5>
+        <select class="weeks-with-tasks">{Week Range}</select>
+    </div>
     <div class="timeline-container">
         <div class="arrow prev-day">prev</div>
         <div class="timeline-grid">
@@ -122,6 +152,7 @@ template.innerHTML = `
         </div>
         <div class="arrow next-day">next</div>
     </div>
+</div>
 `;
 class TimelineTaskBox extends HTMLElement {
     constructor() {
@@ -133,10 +164,14 @@ class TimelineTaskBox extends HTMLElement {
         this.$prevDay = this._shadowRoot.querySelector(".prev-day");
         this.$nextDay = this._shadowRoot.querySelector(".next-day");
 
+        this.$monthName = this._shadowRoot.querySelector(".timeline-month-name");
+        this.$weeksWithTasks = this._shadowRoot.querySelector(".weeks-with-tasks");
         this.$weekGrid = this._shadowRoot.querySelector(".week-grid");
         this.$tasksGrid = this._shadowRoot.querySelector(".tasks-grid");
 
+        this.$months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         this.$days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        this.$drawOptionWeeks = true;
         this.$date = new Date();
         this.$data = [];
     }
@@ -159,7 +194,7 @@ class TimelineTaskBox extends HTMLElement {
     }
 
     _drawTimeline(tasks, week) {
-        console.log(tasks, week);
+        // console.log(tasks, week);
 
         this.$weekGrid.innerHTML = '';
         this.$tasksGrid.innerHTML = '';
@@ -236,10 +271,7 @@ class TimelineTaskBox extends HTMLElement {
         btnNextDay.innerHTML = '&#x276F;';
         btnNextDay.addEventListener('click', (e) => { this._proccesData(new Date(nextDay), this.$data); });
         this.$nextDay.appendChild(btnNextDay);
-
     }
-
-
 
     _formatDate(string) {
         let date = new Date(string);
@@ -254,9 +286,40 @@ class TimelineTaskBox extends HTMLElement {
         return date;
     }
 
+    _getWeeksWithTasks(dates){
+        this.$weeksWithTasks.innerHTML = '';
+        let weeksWithTasks = [];
+
+        for(const date of dates){
+            let week = this._getWeekDates(date);
+            weeksWithTasks.push({ text: `Week[${week[0].getUTCDate()}/${(week[0].getUTCMonth() + 1)} - ${week[6].getUTCDate()}/${(week[6].getUTCMonth() + 1)}]`, date: date.split('T')[0] });
+        }
+
+        let filtered = weeksWithTasks.filter(function({text}){
+            var key = `${text}`;
+            return !this.has(key) && this.add(key);
+        }, new Set);
+
+        for(const week of filtered){
+            let option = document.createElement('option');
+            option.value = week.date;
+            option.textContent = week.text;
+            this.$weeksWithTasks.appendChild(option);
+        }
+
+        this.$weeksWithTasks.addEventListener('change', (e) => {
+            e.preventDefault();
+            this._proccesData(new Date(this.$weeksWithTasks.value), this.$data);
+        });
+
+        this.$drawOptionWeeks = false;
+    }
+
     _proccesData(date, data) {
         let currentWeek = this._getWeekDates(date);
         let tasksInCurrentWeek = [];
+
+        let daysWithTasks = new Set();
 
         for (const task of data) {
             let indexStart = currentWeek.findIndex((date) => this._formatDate(date.toUTCString()) === this._formatDate(task.initDate));
@@ -271,10 +334,16 @@ class TimelineTaskBox extends HTMLElement {
                 }
                 tasksInCurrentWeek.push({ lineStart: indexStart, lineEnd: indexEnd, task: task });
             }
+            daysWithTasks.add(task.initDate);
         }
+
+        if(this.$drawOptionWeeks){
+            this._getWeeksWithTasks(daysWithTasks);
+        }        
 
         this._drawTimeline(tasksInCurrentWeek, currentWeek);
         this._setPrevNextArrows(currentWeek);
+        this.$monthName.textContent = this.$months[new Date(date).getUTCMonth()];
     }
 
     async _loadData(dataSource) {
