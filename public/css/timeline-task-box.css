@@ -1,0 +1,136 @@
+/* CSS Styles for Timeline Task Box */
+.timeline-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.timeline-month-name {
+    padding: 0.25rem;
+    margin: 0;    
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: gray;
+}
+
+.weeks-with-tasks {
+    display: block;
+    font-size: .95rem;
+    line-height: 1.5;
+    appearance: auto;
+    border: 1px solid lightgray;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    margin-bottom: 0.25rem;
+    color: gray;
+}
+
+.timeline-container {
+    display: flex;
+    padding: 10px;
+    border-radius: .25rem;
+    border: 1px solid #ccc;
+    width: auto;
+}
+
+.arrow {
+    display: flex;
+    padding: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.arrow button {
+    background: none;
+    border: none;
+    font-size: large;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.arrow button:hover {
+    opacity: 1;
+}
+
+.timeline-grid {
+    display: grid;
+    grid-template: "timeline-grid";
+    place-content: unset;
+    place-items: center;
+    width: -moz-available;
+    width: -webkit-fill-available;
+    overflow: hidden;
+}
+
+.timeline-grid>* {
+    grid-area: timeline-grid;
+    min-width: -moz-available;
+    min-width: -webkit-fill-available;
+    min-height: 100%;
+}
+
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr [week-day]);
+    column-gap: 1px;
+}
+
+.day {
+    display: flex;
+    min-height: 5rem;
+    border: 1px solid #ece3e3;
+    background-color: #f9f9f9;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color: rgb(139, 139, 137);            
+}
+
+.day span {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr [task-per-day]);
+    grid-template-rows: auto;
+    column-gap: 1px;
+    row-gap: 1px;
+}
+
+.task {
+    padding: 2px;
+    border-radius: .25rem;
+    opacity: .7;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: initial;
+    color: #fff;
+}
+
+.task .status-badge {
+    float: inline-end;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    margin: 0.1rem;
+    border-radius: 0.25rem;
+    font-size: 0.6rem;
+    font-weight: 700;
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+.status-badge-created {
+    background-color: #0087ff;
+}
+
+.status-badge-completed {
+    background-color: #08b703;
+}
+
+.status-badge-inprocess {
+    background-color: #b7a303;
+}
+
+.status-badge-notset {
+    background-color: #aaa;
+}

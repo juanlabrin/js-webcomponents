@@ -1,0 +1,39 @@
+/* CSS Styles for Timeline Task Modal */
+.timeline-modal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    padding-top: 100px;
+    top: 0px;
+    left: 0px;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.timeline-modal-content {
+    margin: 15% auto;
+    padding: 15px;
+    width: 480px;
+    border: 1px solid #ece3e3;
+    border-radius: 0.25rem;
+    background-color: #fefefe;
+    box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2),0 4px 20px 0 rgba(0,0,0,0.19);
+}
+
+.timeline-modal-task-edit-box {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 5px;
+    padding: 10px;
+    border-radius: 0.25rem;
+    border: 1px solid #ece3e3;
+}
+
+.timeline-modal-btn-edit {
+    border: none;
+    border-radius: 0.25rem;
+    background-color: #07b4ee;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),0 1px 1px rgba(0, 0, 0, 0.075);
+    font-weight: 600;
+    color: #fff;
+}

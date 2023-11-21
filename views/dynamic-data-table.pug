@@ -44,8 +44,8 @@ block content
                                         p With all options enabled except <strong>showId</strong> by default false & <strong>data-source</strong> attribute link.
                                         img(src="images/ddt-items.png" width="100%")
                                                                         
-                            .col-md-7
-                                dynamic-data-table(data-source="/items/list" id="items-ddt")
+                            .col-md-7.component-container
+                                dynamic-data-table.component(data-source="/items/list" id="items-ddt")
                 .card.mb-3 
                     .card-body
                         .row 
@@ -54,8 +54,8 @@ block content
                                         h3 Dynamic Data Table usage. 
                                         p With no options & only <strong>data-source</strong> attribute link.
                                         img(src="images/ddt-posts.png" width="100%")
-                            .col-md-7
-                                dynamic-data-table(data-source="/posts/list")
+                            .col-md-7.component-container
+                                dynamic-data-table.component(data-source="/posts/list")
                 .card.mb-3 
                     .card-body
                         .row 
@@ -64,8 +64,8 @@ block content
                                         h3 Dynamic Data Table usage. 
                                         p With <strong>showId, showPagination, rowsPerPage, showCaption & columns</strong> options settings & <strong>data-source</strong> attribute link.
                                         img(src="images/ddt-invoices.png" width="100%")
-                            .col-md-7
-                                dynamic-data-table(data-source="/invoices/list" id="invoices-ddt")
+                            .col-md-7.component-container
+                                dynamic-data-table.component(data-source="/invoices/list" id="invoices-ddt")
                 .card.mb-3 
                     .card-body                        
                         .row 
@@ -74,8 +74,8 @@ block content
                                         h3 Dynamic Data Table usage. 
                                         p With no options & only <strong>data-source</strong> attribute link, whitout data response.
                                         img(src="images/ddt-users.png" width="100%")
-                            .col-md-7 
-                                dynamic-data-table(data-source="/users/list")
+                            .col-md-7.component-container
+                                dynamic-data-table.component(data-source="/users/list")
                 .card.mb-3 
                     .card-body
                         .row 
@@ -84,9 +84,9 @@ block content
                                         h3 Dynamic Data Table usage. 
                                         p With no options & no <strong>data-source</strong> attribute link.
                                         img(src="images/ddt-no-datasource.png" width="100%")
-                            .col-md-7 
+                            .col-md-7.component-container                                 
+                                dynamic-data-table.component
                                 p Table instantiated but without attributes (not initializated)
-                                dynamic-data-table
 
     script(type='module', src='/js/dynamic-data-table/dynamic-data-table.class.js')
     script.

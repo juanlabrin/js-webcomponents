@@ -1,143 +1,7 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
-.timeline-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-.timeline-month-name {
-    padding: 0.25rem;
-    margin: 0;    
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: gray;
-}
-
-.weeks-with-tasks {
-    display: block;
-    font-size: .95rem;
-    line-height: 1.5;
-    appearance: auto;
-    border: 1px solid lightgray;
-    border-radius: 0.25rem;
-    background-color: #fff;
-    margin-bottom: 0.25rem;
-    color: gray;
-}
-
-.timeline-container {
-    display: flex;
-    padding: 10px;
-    border-radius: .25rem;
-    border: 1px solid #ccc;
-    width: auto;
-}
-
-.arrow {
-    display: flex;
-    padding: 5px;
-    justify-content: center;
-    align-items: center;
-}
-
-.arrow button {
-    background: none;
-    border: none;
-    font-size: large;
-    cursor: pointer;
-    opacity: 0.5;
-}
-
-.arrow button:hover {
-    opacity: 1;
-}
-
-.timeline-grid {
-    display: grid;
-    grid-template: "timeline-grid";
-    place-content: unset;
-    place-items: center;
-    width: -moz-available;
-    width: -webkit-fill-available;
-    overflow: hidden;
-}
-
-.timeline-grid>* {
-    grid-area: timeline-grid;
-    min-width: -moz-available;
-    min-width: -webkit-fill-available;
-    min-height: 100%;
-}
-
-.week-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr [week-day]);
-    column-gap: 1px;
-}
-
-.day {
-    display: flex;
-    min-height: 5rem;
-    border: 1px solid #ece3e3;
-    background-color: #f9f9f9;
-    justify-content: center;
-    align-items: center;
-    font-size: 10px;
-    color: rgb(139, 139, 137);            
-}
-
-.day span {
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.tasks-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr [task-per-day]);
-    grid-template-rows: auto;
-    column-gap: 1px;
-    row-gap: 1px;
-}
-
-.task {
-    padding: 2px;
-    border-radius: .25rem;
-    /* background-color: rgb(0, 162, 255); */
-    opacity: .7;
-    font-size: 10px;
-    font-weight: 600;
-    text-align: initial;
-    color: #fff;
-}
-
-.task .status-badge {
-    float: inline-end;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
-    margin: 0.1rem;
-    border-radius: 0.25rem;
-    font-size: 0.6rem;
-    font-weight: 700;
-    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2), 0 1px 1px 0 rgba(0, 0, 0, 0.12);
-}
-
-.status-badge-created {
-    background-color: #0087ff;
-}
-
-.status-badge-completed {
-    background-color: #08b703;
-}
-
-.status-badge-inprocess {
-    background-color: #b7a303;
-}
-
-.status-badge-notset {
-    background-color: #aaa;
-}
-
+@import "/css/timeline-task-box.css";
 </style>
 <div class="wrap">
     <div class="timeline-header">
@@ -176,6 +40,20 @@ class TimelineTaskBox extends HTMLElement {
         this.$data = [];
     }
 
+    async _sendData(url, data) {
+        let options = {
+            method: 'post',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        // console.log(options);
+        const response = await fetch(url, options);
+        const json = await response.json();
+        return json;
+    }
+
     async _getData(url) {
         const response = await fetch(url);
         const json = await response.json();
@@ -191,6 +69,84 @@ class TimelineTaskBox extends HTMLElement {
             weekDatesArray.push(new Date(d));
         }
         return weekDatesArray;
+    }
+
+    _drawModal(task){
+        // console.log(task);
+        let options = ['NOT SET', 'CREATED', 'IN PROCESS', 'ON HOLD', 'COMPLETED', 'NEED INTERVENTION', 'CANCELLED'];
+        
+        let modal = document.createElement('div');
+        let modalContent = document.createElement('div');
+        let taskEditBox = document.createElement('div');
+        
+        let modalTitle = document.createElement('h5');
+        let btnEdit = document.createElement('button');
+
+        let inputDivId = document.createElement('input');
+        let inputDivTitle = document.createElement('input');
+        let inputDivStatus = document.createElement('select');
+        let inputDivInitDate = document.createElement('input');
+        let inputDivLimitDate = document.createElement('input');
+
+        for (const o of options) {
+            let option = document.createElement('option');
+            option.value = o;
+            option.textContent = o;
+            inputDivStatus.appendChild(option);
+        }
+
+        inputDivId.value = task._id;
+        inputDivTitle.value = task.title;
+        inputDivStatus.value = task.status;
+        inputDivInitDate.value = task.initDate.split('T')[0];
+        inputDivLimitDate.value = (task.limitDate != null)?task.limitDate.split('T')[0]:task.initDate.split('T')[0];
+
+        inputDivId.type = 'hidden';
+        inputDivInitDate.type = 'date';
+        inputDivLimitDate.type = 'date';
+
+        inputDivTitle.style.gridColumn = '1/5';
+
+        modalTitle.textContent = 'Edit Task';
+        btnEdit.textContent = 'Save';
+
+        btnEdit.addEventListener('click', async (e) => {
+            console.log(inputDivId.value);
+            let set = {
+                title: inputDivTitle.value,
+                status: inputDivStatus.value,
+                initDate: inputDivInitDate.value,
+                limitDate: inputDivLimitDate.value
+            }
+            let response = await this._sendData('/tasks/update', { _id: inputDivId.value, set: set });
+            if(response.success){
+                this.refresh();
+                modal.remove();
+            }
+        });
+
+        taskEditBox.appendChild(modalTitle);
+        taskEditBox.appendChild(inputDivId);
+        taskEditBox.appendChild(inputDivTitle);
+        taskEditBox.appendChild(inputDivStatus);
+        taskEditBox.appendChild(inputDivInitDate);
+        taskEditBox.appendChild(inputDivLimitDate);
+
+        btnEdit.classList.add('timeline-modal-btn-edit');
+        taskEditBox.classList.add('timeline-modal-task-edit-box');
+        modalContent.classList.add('timeline-modal-content');
+        modal.classList.add('timeline-modal');
+
+        taskEditBox.appendChild(btnEdit);
+        modalContent.appendChild(taskEditBox);
+        modal.appendChild(modalContent);        
+        document.getElementsByTagName('body')[0].appendChild(modal);
+
+        window.addEventListener('click', (e) => {
+            if(e.target === modal){
+                modal.remove();
+            }
+        });
     }
 
     _drawTimeline(tasks, week) {
@@ -226,6 +182,8 @@ class TimelineTaskBox extends HTMLElement {
 
                 taskTitle.textContent = t.task.title;
                 taskStatus.textContent = t.task.status;
+
+                task.addEventListener('click', (e) => { this._drawModal(t.task); });
 
                 task.appendChild(taskTitle);
                 task.appendChild(taskStatus);
@@ -375,4 +333,5 @@ class TimelineTaskBox extends HTMLElement {
     }
 
 }
+
 customElements.define('timeline-task-box', TimelineTaskBox);

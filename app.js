@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const logger = require('morgan');
+var bodyParser = require('body-parser');
 
 const mongoose = require('mongoose');
 
@@ -18,6 +19,8 @@ app.set('views', [path.join(__dirname, 'views'), path.join(__dirname, 'views/lab
 app.set('view engine', 'pug');
 
 app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public/')));
 
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
@@ -27,7 +30,7 @@ app.use('/js', express.static(__dirname + '/node_modules/@fortawesome/fontawesom
 app.use('/webfonts', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/webfonts'));
 
 let itemSchema = new mongoose.Schema({
-    sku: { type: String, unique: true, required: true },    
+    sku: { type: String, unique: true, required: true },
     description: { type: String, required: true },
     cost: { type: Number, min: 0, required: true },
     price: { type: Number, min: 0, required: true },
@@ -35,8 +38,8 @@ let itemSchema = new mongoose.Schema({
     barcode: { type: String, unique: true }
 });
 
-itemSchema.pre('save', function(next){
-    if(this.barcode == undefined){
+itemSchema.pre('save', function (next) {
+    if (this.barcode == undefined) {
         this.barcode = this.sku.toUpperCase();
     }
     next();
@@ -51,7 +54,10 @@ let postSchema = new mongoose.Schema({
 });
 
 let taskSchema = new mongoose.Schema({
-    title: { type: String, required: true }
+    title: { type: String, required: true },
+    status: { type: String },
+    initDate: { type: Date },
+    limitDate: { type: Date }
 });
 
 let projectSchema = new mongoose.Schema({
@@ -127,6 +133,11 @@ app.get('/posts/list', async (req, res, next) => {
 app.get('/tasks/list', async (req, res, next) => {
     let tasks = await Task.find({}, 'title initDate limitDate projectId taskColor status');
     res.json({ success: true, data: tasks });
+});
+
+app.post('/tasks/update', async (req, res, next) => {
+    let updateTask = await Task.findByIdAndUpdate({ _id: req.body._id }, { $set: req.body.set });
+    res.json({ success: true, data: updateTask });
 });
 
 app.get('/users/list', async (req, res, next) => {
