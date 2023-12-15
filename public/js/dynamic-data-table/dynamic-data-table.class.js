@@ -3,12 +3,50 @@ template.innerHTML = `
 <style>
 /* @import "/css/ddt-styles.css"; */
 @import "/css/bootstrap.min.css";
-* {
-    font-size: 12px;
+* { font-size: 12px; }
+@media (min-width: 380px) {
+    .ddt-header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding-top: 0.25rem;
+        padding-bottom: 1rem;
+        gap: 1rem;
+    }
+    .rows-per-page {
+        width: 100px;
+    }
+    .search-box {
+        width: 200px;
+    }
+}
+@media (min-width: 767px) {
+    .rows-per-page {
+        width: auto;
+    }
+    .search-box {
+        width: auto;
+    }
 }
 </style>
-<div class="search-box"></div>
-<table class="table table-sm table-striped"></table>
+<div class="ddt-wrap">
+    <div class="ddt-header">
+        <div class="rows-per-page input-group d-none">
+            <span class="input-group-text">Rows</span>
+            <select class="form-control" dir="rtl">
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="search-box"></div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped"></table>
+    </div>    
+</div>
 `;
 class DynamicDataTable extends HTMLElement {
     constructor() {
@@ -22,8 +60,12 @@ class DynamicDataTable extends HTMLElement {
         this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
+        this.$rowsPerPageBox = this._shadowRoot.querySelector('.rows-per-page');
+        this.$setRowsPerPage = this._shadowRoot.querySelector('.rows-per-page select');
         this.$searchBox = this._shadowRoot.querySelector('.search-box');
         this.$dynamicTable = this._shadowRoot.querySelector('table');
+
+        this.$setRowsPerPage.addEventListener('change', this._setRowsPerPage.bind(this));
 
         this.$data;
         this.$columns = [];
@@ -54,6 +96,11 @@ class DynamicDataTable extends HTMLElement {
         this._loadData(this.dataSource);
     }
 
+    _setRowsPerPage(e) {
+        this.$rowsPerPage = parseInt(e.target.value);
+        this.refresh();
+    }
+
     _sortData(type, column, data) {
         if (type === 'asc') {
             if (typeof data[0][column] === 'number') {
@@ -75,7 +122,9 @@ class DynamicDataTable extends HTMLElement {
     }
 
     _searchData(query) {
-        let result = this.$data.filter((row) => row.description.match(new RegExp(query)));
+        //- let result = this.$data.filter((row) => row.description.match(new RegExp(query)));
+        //- console.log(query, this.$data);
+        let result = this.$data.filter((row) => Object.keys(row).some(key => row[key].toString().toLowerCase().includes(query.toString().toLowerCase())));
         return result;
     }
 
@@ -85,24 +134,69 @@ class DynamicDataTable extends HTMLElement {
         let pages = Math.ceil(this.$data.length / this.$rowsPerPage);
         let pagesContainer = document.createElement('div');
 
-        for (let i = 0; i < pages; i++) {
-            let pageLink = document.createElement('button');
-            pageLink.id = i;
-            pageLink.textContent = i + 1;
-            if (i === currentPage) {
-                pageLink.classList.add('active');
+        let pagesPerPage = 10;
+        let limitPage = currentPage + pagesPerPage;
+
+        if ((currentPage + pagesPerPage) >= pages) {
+            // console.table([{ "currentPage": currentPage, "limitPage": limitPage, "rowsPerPage": this.$rowsPerPage, "pages": pages, "dataLength": this.$data.length }]);
+
+            let i = ((pages - pagesPerPage) < 0) ? 0 : (pages - pagesPerPage);
+
+            for (i; i < pages; i++) {
+
+                let pageLink = document.createElement('button');
+
+                pageLink.id = i;
+                pageLink.textContent = i + 1;
+                pageLink.classList.add('btn', 'btn-sm', 'btn-primary');
+
+                if (i === currentPage) {
+                    pageLink.classList.add('active');
+                }
+
+                pageLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this._drawTable(parseInt(pageLink.id));
+                });
+
+                pagesContainer.appendChild(pageLink);
+
             }
-            pageLink.addEventListener('click', (e) => {
-                e.preventDefault();
-                this._drawTable(parseInt(pageLink.id));
-            });
-            pagesContainer.appendChild(pageLink);
+
+        } else {
+
+            for (let i = 0; i < pages; i++) {
+                if (i >= currentPage && i < limitPage) {
+
+                    let pageLink = document.createElement('button');
+
+                    pageLink.id = i;
+                    pageLink.textContent = i + 1;
+                    pageLink.classList.add('btn', 'btn-sm', 'btn-primary');
+
+                    if (i === currentPage) {
+                        pageLink.classList.add('active');
+                    }
+
+                    if (i === limitPage - 1 && limitPage < pages) {
+                        pageLink.textContent = '...';
+                    }
+
+                    pageLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this._drawTable(parseInt(pageLink.id));
+                    });
+
+                    pagesContainer.appendChild(pageLink);
+                }
+            }
         }
 
         if (currentPage > 0) {
             let prevPage = document.createElement('button');
             prevPage.innerHTML = '&#10094;';
             prevPage.id = currentPage - 1;
+            prevPage.classList.add('btn', 'btn-sm', 'btn-secondary');
             prevPage.addEventListener('click', (e) => {
                 e.preventDefault();
                 this._drawTable(parseInt(prevPage.id));
@@ -110,10 +204,11 @@ class DynamicDataTable extends HTMLElement {
             pagesContainer.prepend(prevPage);
         }
 
-        if (currentPage < (pages - 1)) {
+        if (currentPage < (pages - 1) && pages > limitPage) {
             let nextPage = document.createElement('button');
             nextPage.innerHTML = '&#10095;';
             nextPage.id = currentPage + 1;
+            nextPage.classList.add('btn', 'btn-sm', 'btn-secondary');
             nextPage.addEventListener('click', (e) => {
                 e.preventDefault();
                 this._drawTable(parseInt(nextPage.id));
@@ -128,6 +223,13 @@ class DynamicDataTable extends HTMLElement {
         }
 
         pagesContainer.id = "pages-container";
+        pagesContainer.style.display = 'flex';
+        pagesContainer.style.flexDirection = 'row';
+        pagesContainer.style.justifyContent = 'center';
+        pagesContainer.style.gap = '0.25rem';
+        pagesContainer.style.paddingTop = '1rem';
+        pagesContainer.style.paddingBottom = '1rem';
+
         tFoot.cells[0].appendChild(pagesContainer);
     }
 
@@ -223,48 +325,74 @@ class DynamicDataTable extends HTMLElement {
         }
     }
 
+    _drawSearching(){
+        // console.log('Show searching');
+        this.$searchBox.innerHTML = '';
+        let searchBox = document.createElement('div');
+        let inputQuery = document.createElement('input');
+        let btnSearch = document.createElement('button');
+        let btnRefresh = document.createElement('button');
+
+        searchBox.classList.add('input-group');
+        inputQuery.classList.add('form-control');
+
+        btnSearch.classList.add('btn', 'btn-primary');
+        btnSearch.textContent = 'Search';
+
+        btnSearch.addEventListener('click', (e) => {
+            e.preventDefault(e);
+            if (inputQuery.value === '') {
+                alert('Please fill the search input.');
+                inputQuery.focus();
+                return;
+            }
+            console.log(inputQuery.value);
+            this.$data = this._searchData(inputQuery.value);
+            this._drawTable();
+        });
+
+        btnRefresh.classList.add('btn', 'btn-secondary');
+        btnRefresh.innerHTML = '&#10227;';
+        btnRefresh.style.paddingLeft = '0.55rem';
+        btnRefresh.style.paddingRight = '0.55rem';
+        btnRefresh.style.paddingTop = '0';
+        btnRefresh.style.paddingBottom = '0';
+        btnRefresh.style.fontWeight = '500';
+        btnRefresh.style.fontSize = '1.75rem';
+        btnRefresh.style.lineHeight = '0';
+
+        btnRefresh.addEventListener('click', (e) => {
+            e.preventDefault(e);
+            this.refresh();
+        });
+
+        searchBox.appendChild(inputQuery);
+        searchBox.appendChild(btnSearch);
+        searchBox.appendChild(btnRefresh);
+        this.$searchBox.appendChild(searchBox);
+    }
+
     _drawTable(page = 0) {
 
-        // TODO Remove from here and add in the connectedCallback method
-        if (this.$showSearching) {
-            console.log('Show searching');
-            this.$searchBox.innerHTML = '';
-            let searchBox = document.createElement('div');
-            let inputQuery = document.createElement('input');
-            let btnSearch = document.createElement('button');
+        //- console.log(this.$data[0]);
 
-            // I use bootstrap 5 
-            searchBox.classList.add('input-group');
-            inputQuery.classList.add('form-control');
-            btnSearch.classList.add('btn', 'btn-primary');
-            btnSearch.textContent = 'Search';
-
-            btnSearch.addEventListener('click', (e) => {
-                e.preventDefault(e);
-                if (inputQuery.value === '') {
-                    alert('Please fill the search input.');
-                    inputQuery.focus();
-                    return;
-                }
-                console.log(inputQuery.value);
-                // TODO write the search function/method
-                // Add result to temp data and draw the table
-                this.$data = this._searchData(inputQuery.value);
-                console.log(this.$data);
-                this._drawTable();
-            });
-
-            searchBox.appendChild(inputQuery);
-            searchBox.appendChild(btnSearch);
-            this.$searchBox.appendChild(searchBox);
-
+        if (this.$columns.length == 0) {
+            for (const key in this.$data[0]) {
+                this.$columns.push(key);
+            }
         }
 
+        if (this.$showSearching) {
+            this._drawSearching();
+        }
+
+        //- TODO: Fix bug with colums less than 3
         if (this.$showSorting) {
             this.$data = this._sortData(this.$sortType, this.$columns[this.$sortByColumn], this.$data);
         }
 
         if (this.$showPagination) {
+            this.$rowsPerPageBox.classList.remove('d-none');
             this.$dynamicTable.innerHTML = '';
             let startIndex = page * this.$rowsPerPage;
             let limitIndex = startIndex + this.$rowsPerPage;
@@ -398,7 +526,6 @@ class DynamicDataTable extends HTMLElement {
 
     attributeChangedCallback(name) {
         if (name === 'settings') {
-            // console.log(this.settings);
             this.setOptions(JSON.parse(this.settings));
         }
     }

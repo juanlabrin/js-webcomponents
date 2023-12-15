@@ -46,8 +46,19 @@ itemSchema.pre('save', function (next) {
 });
 
 let invoiceSchema = new mongoose.Schema({
-    invoiceId: { type: Number }
+    invoiceId: { type: Number },
+    total: { type: Number },
+    status: { type: String }
 });
+
+let orderSchema = new mongoose.Schema({
+    date: { type: Date, required: true, default: Date.now() },
+    doc: { type: mongoose.Schema.Types.ObjectId, refPath: 'docType', required: true },
+    docType: { type: String, enum: ['invoices', 'purchases', 'workorders', 'shoppingcart'], required: true },
+    tax: { type: Number },
+    total: { type: Number },
+    grandTotal: { type: Number }
+})
 
 let postSchema = new mongoose.Schema({
     title: { type: String }
@@ -70,6 +81,7 @@ let userSchema = new mongoose.Schema({
 
 let Item = mongoose.model('items', itemSchema);
 let Invoice = mongoose.model('invoices', invoiceSchema);
+let Order = mongoose.model('orders', orderSchema);
 let Post = mongoose.model('posts', postSchema, 'post');
 let Task = mongoose.model('tasks', taskSchema);
 let Project = mongoose.model('projects', projectSchema);
@@ -91,8 +103,8 @@ app.get('/dynamic-data-table', (req, res, next) => {
     res.render('dynamic-data-table', { title: 'Dynamic Data Table' });
 });
 
-app.get('/dynamic-data-table/lab', (req, res, next) => {
-    res.render('dynamic-data-table-lab', { title: 'Dynamic Data Table {lab}' });
+app.get('/lab/dynamic-data-table', (req, res, next) => {
+    res.render('dynamic-data-table-lab', { title: 'Lab - Dynamic Data Table', source: '/items/list' });
 });
 
 app.get('/rich-text-editor', (req, res, next) => {
@@ -121,7 +133,22 @@ app.get('/items/list', async (req, res, next) => {
 });
 
 app.get('/invoices/list', async (req, res, next) => {
-    let invoices = await Invoice.find({});
+    let invoices = [];
+    let data = await Order.find({ active: true }).populate('doc');
+    //- console.log(data[0]);
+    for (const invoice of data) {
+        invoices.push({
+            _id: invoice._id,
+            date: invoice.date.toISOString().split('T')[0],
+            number: invoice.doc.invoiceId,
+            total: Math.round(invoice.total),
+            tax: invoice.tax,
+            taxAmount: Math.round(invoice.doc.total - invoice.total),
+            totalWithTax: invoice.doc.total,
+            status: invoice.doc.status
+        });
+    }
+    //- console.log(invoices[0]);
     res.json({ success: true, invoices: invoices });
 });
 

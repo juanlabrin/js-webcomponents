@@ -31,6 +31,7 @@ block content
                         strong Table Caption: 
                         Give your table a meaningful name or caption to provide context and enhance accessibility.
                 p This Dynamic Data Table Web Component is designed with simplicity and usability in mind. It's an excellent addition to any web application or website that requires the presentation of data in a structured and organized manner, with the added benefit of versatile data source options.
+                a(href="/lab/dynamic-data-table") Dynamic Data Table Lab
         .card.mb-3 
             .card-header
                 h2 DDT - Examples
@@ -103,13 +104,12 @@ block content
 
         const ddtInvoices = document.getElementById('invoices-ddt');     
         let optionsDDTInvoices = {
-            showId: true,
             showSorting: true,
             sortByColumn: 2,
             showPagination: true,
             rowsPerPage: 10,
-            showCaption: true,
-            columns: ['_id', 'createdAt', 'invoiceId', 'total']
+            showSearching: true,
+            columns: ['_id', 'date', 'total', 'grandTotal', 'description']
         }
         ddtInvoices.setAttribute('settings', JSON.stringify(optionsDDTInvoices));
         
