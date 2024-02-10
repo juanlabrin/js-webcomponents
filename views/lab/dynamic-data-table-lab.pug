@@ -7,15 +7,81 @@ block content
             .card-body 
                 //- dynamic-data-table#ddt(data-source='/invoices/list')
                 dynamic-data-table#ddt
-    script(type='module', src='/js/dynamic-data-table/dynamic-data-table.class.js')
+    script(type='module', src='/js/dynamic-data-table/dynamic-data-table-2024.class.js')
     script.
+        //- Config for DDT .24
         const ddt = document.getElementById('ddt');
-        let ddtOptions = {                    
-                showSorting: true,
-                sortByColumn: 2,
-                showCaption: true,
-                showPagination: true,
-                showSearching: true
-            }
-        ddt.setAttribute('data-source', '/invoices/list');
-        ddt.setAttribute('settings', JSON.stringify(ddtOptions));
+        var ddtParams = {
+            showSorting: true,
+            sortByColumn: 1,
+            sortType: 'desc',
+            showCaption: true,
+            showPagination: true,
+            showSearching: true,
+            showActions: true
+        };
+        var ddtDataSource = "/invoices/list";
+        var ddtColDef = [
+            {data:"_id", type:"string", name:"id", render: {show: false, sort: false}}, //- Required for actions buttons (name:"id")
+            {data:"number", type:"number", name:"numero", render: {sort: true}},
+            {data:"date", type:"date", name:"fecha"}, 
+            {data:"total", type:"currency", name:"total"},
+            {data:"tax", type:"string", name:"%iva"}, 
+            {data:"taxAmount", type:"currency", name:"iva"},
+            {data:"totalWithTax", type:"currency", name:"total + iva"},           
+            {data:"status", type:"string", name:"estado"}
+            ];
+
+        ddt.setAttribute('settings', JSON.stringify(ddtParams));
+        ddt.setAttribute('columns-def', JSON.stringify(ddtColDef));
+        ddt.setAttribute('data-source', ddtDataSource);
+
+        //- Config for DDT .23
+        //- const ddt = document.getElementById('ddt');
+        //- let ddtSettings = {                    
+        //-         showSorting: true,
+        //-         sortByColumn: 1,
+        //-         sortType: 'desc',
+        //-         showCaption: true,
+        //-         showPagination: true,
+        //-         showSearching: true,
+        //-         defColumns: [
+        //-             {
+        //-                 data: "_id",
+        //-                 name: "id",
+        //-                 type: "string"
+        //-             },
+        //-             {
+        //-                 data: "date",
+        //-                 name: "fecha",
+        //-                 type: "date"
+        //-             },
+        //-             {
+        //-                 data: "number",
+        //-                 name: "numero",
+        //-                 type: "number"
+        //-             },
+        //-             {
+        //-                 data: "tax",
+        //-                 name: "impuesto",
+        //-                 type: "number"
+        //-             },
+        //-             {
+        //-                 data: "total",
+        //-                 name: "total",
+        //-                 type: "currency"
+        //-             },
+        //-             {
+        //-                 data: "grandTotal",
+        //-                 name: "total con impuesto",
+        //-                 type: "currency"
+        //-             },
+        //-             {
+        //-                 data: "status",
+        //-                 name: "estado",
+        //-                 type: "string"
+        //-             },
+        //-         ]
+        //-     }
+        //- ddt.setAttribute('data-source', '/invoices/list');
+        //- ddt.setAttribute('settings', JSON.stringify(ddtSettings));

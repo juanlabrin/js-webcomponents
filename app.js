@@ -134,7 +134,8 @@ app.get('/items/list', async (req, res, next) => {
 
 app.get('/invoices/list', async (req, res, next) => {
     let invoices = [];
-    let data = await Order.find({ active: true }).populate('doc');
+    let data = await Order.find({ active: true, date: { $gte: new Date('2023-11-01') } }).populate('doc');
+    //- let data = await Order.find({ active: true }).populate('doc');
     //- console.log(data[0]);
     for (const invoice of data) {
         invoices.push({

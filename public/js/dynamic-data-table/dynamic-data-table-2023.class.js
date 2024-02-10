@@ -69,6 +69,8 @@ class DynamicDataTable extends HTMLElement {
 
         this.$data;
         this.$columns = [];
+        this.$defColumns = [];
+
         this.$showId = false;
         this.$showCaption = false;
         this.$tableCaption;
@@ -192,7 +194,8 @@ class DynamicDataTable extends HTMLElement {
             }
         }
 
-        if (currentPage > 0) {
+        if (currentPage > 0 && pages >= limitPage) {
+            //- console.log(currentPage, pages, limitPage);
             let prevPage = document.createElement('button');
             prevPage.innerHTML = '&#10094;';
             prevPage.id = currentPage - 1;
@@ -325,7 +328,7 @@ class DynamicDataTable extends HTMLElement {
         }
     }
 
-    _drawSearching(){
+    _drawSearching() {
         // console.log('Show searching');
         this.$searchBox.innerHTML = '';
         let searchBox = document.createElement('div');
@@ -374,7 +377,11 @@ class DynamicDataTable extends HTMLElement {
 
     _drawTable(page = 0) {
 
-        //- console.log(this.$data[0]);
+        if(this.$defColumns.length > 0){
+            for (const col of this.$defColumns){
+                console.log(col.data);
+            }
+        }
 
         if (this.$columns.length == 0) {
             for (const key in this.$data[0]) {
@@ -506,8 +513,8 @@ class DynamicDataTable extends HTMLElement {
         return this.getAttribute('settings');
     }
 
-    set settings(settings) {
-        this.setAttribute('settings', settings);
+    set settings(args) {
+        this.setAttribute('settings', args);
     }
 
     static get observedAttributes() {
@@ -516,18 +523,21 @@ class DynamicDataTable extends HTMLElement {
 
     connectedCallback() {
         console.log(`${this._componentName} - ${this._componentVersion} connected!`);
-        if (this.hasAttribute('data-source')) {
-            this._loadData(this.dataSource);
-        }
-        if (this.hasAttribute('settings')) {
-            this.setOptions(this.settings);
-        }
+        // if (this.hasAttribute('data-source')) {
+        //     this._loadData(this.dataSource);
+        // }
+        // if (this.hasAttribute('settings')) {
+        //     this.setOptions(JSON.parse(this.settings));
+        // }
     }
 
     attributeChangedCallback(name) {
+        if (name === 'data-source') {
+            this._loadData(this.dataSource);
+        }
         if (name === 'settings') {
             this.setOptions(JSON.parse(this.settings));
-        }
+        }        
     }
 }
 
