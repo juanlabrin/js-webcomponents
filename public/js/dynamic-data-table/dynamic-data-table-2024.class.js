@@ -49,7 +49,7 @@ class DynamicDataTable extends HTMLElement {
     #pageLimit;
 
     #rowsPerPage = 10;
-    #rowInit;
+    #rowInit = 0;
     #rowLimit;
 
     //- Public Attributes
@@ -218,20 +218,28 @@ class DynamicDataTable extends HTMLElement {
     #_drawTable() {
 
         let tableData = this.#data;
+        this.#rowLimit = this.#data.length - 1;
 
         if (this.$columnsDef.length > 0) {
             tableData = this.#_formatData();
         }
 
-        this.#_drawPagination();
-
         // Clear Table Content
         this.#dynamicTable.innerHTML = '';
+
+        if (this.$params.hasOwnProperty('showPagination')) {
+            if (this.$params.showPagination) {
+                this.#_drawPagination();
+            }
+        }
+
+        console.log(this.#rowInit, this.#rowLimit);
 
         // Draw Table Content
         for (let index = this.#rowInit; index <= this.#rowLimit; index++) {
 
             let row = this.#dynamicTable.insertRow();
+
             if (this.$columnsDef.length > 0) {
                 for (const column of this.$columnsDef) {
 
@@ -311,27 +319,27 @@ class DynamicDataTable extends HTMLElement {
         this.#pageInit = (pages <= this.#pagesPerPage) ? 1 : (this.#actualPage <= Math.floor(this.#pagesPerPage / 2)) ? 1 : ((this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1)) >= pages) ? pages - this.#pagesPerPage + 1 : this.#actualPage - Math.floor(this.#pagesPerPage / 2);
 
         this.#pageLimit = (pages <= this.#pagesPerPage) ? pages : (this.#actualPage <= Math.floor(this.#pagesPerPage / 2)) ? this.#pagesPerPage : ((this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1)) >= pages) ? pages : this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1);
-        
+
         let drawPages = Array.from(Array((this.#pageLimit + 1) - this.#pageInit).keys()).map(i => this.#pageInit + i);
 
         this.#rowInit = (this.#actualPage == 1) ? 0 : (this.#actualPage * this.#rowsPerPage) - this.#rowsPerPage;
-        this.#rowLimit = (this.#actualPage == 1) ? this.#rowsPerPage - 1 : (((this.#actualPage * this.#rowsPerPage) - 1) >= this.#data.length) ? this.#data.length - 1 : ((this.#actualPage * this.#rowsPerPage) - 1);    
+        this.#rowLimit = (this.#actualPage == 1) ? this.#rowsPerPage - 1 : (((this.#actualPage * this.#rowsPerPage) - 1) >= this.#data.length) ? this.#data.length - 1 : ((this.#actualPage * this.#rowsPerPage) - 1);
 
-        for (const page of drawPages){
+        for (const page of drawPages) {
             let btn = document.createElement('button');
-                btn.classList.add('btn', 'btn-sm');
-                (this.#actualPage == page) ? btn.classList.add('btn-secondary') : btn.classList.add('btn-primary');
-                btn.textContent = page;
-                btn.addEventListener('click', (e) => {
-                    this.#actualPage = page;
-                    this.#_drawTable();
-                });
+            btn.classList.add('btn', 'btn-sm');
+            (this.#actualPage == page) ? btn.classList.add('btn-secondary') : btn.classList.add('btn-primary');
+            btn.textContent = page;
+            btn.addEventListener('click', (e) => {
+                this.#actualPage = page;
+                this.#_drawTable();
+            });
 
-                pagesContainer.appendChild(btn);
+            pagesContainer.appendChild(btn);
         }
 
         //- Next button
-        if (drawPages[this.#pagesPerPage-1] < pages) {
+        if (drawPages[this.#pagesPerPage - 1] < pages) {
             let btn = document.createElement('button');
             btn.classList.add('btn', 'btn-sm', 'btn-light');
             btn.textContent = ">>";
@@ -368,6 +376,7 @@ class DynamicDataTable extends HTMLElement {
 
     async #_loadData(url) {
         let result = await this.#_getData(url);
+
         if (Object.keys(result).length > 1) {
             if (result.success == true) {
                 this.#data = result[Object.keys(result)[1]];
@@ -392,11 +401,6 @@ class DynamicDataTable extends HTMLElement {
 
             this.#_drawTable();
 
-            if (this.$params.hasOwnProperty('showPagination')) {
-                if (this.$params.showPagination) {
-                    this.#_drawPagination();
-                }
-            }
         } else {
             this.#dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
         }
