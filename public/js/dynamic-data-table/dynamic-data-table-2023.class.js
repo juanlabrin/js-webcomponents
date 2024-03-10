@@ -401,6 +401,7 @@ class DynamicDataTable extends HTMLElement {
         if (this.$showPagination) {
             this.$rowsPerPageBox.classList.remove('d-none');
             this.$dynamicTable.innerHTML = '';
+            
             let startIndex = page * this.$rowsPerPage;
             let limitIndex = startIndex + this.$rowsPerPage;
 

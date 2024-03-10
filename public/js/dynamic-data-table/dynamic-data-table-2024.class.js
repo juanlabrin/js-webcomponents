@@ -1,20 +1,60 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
+
     @import "/css/bootstrap.min.css";
-    *{ font-size: 12px; }
+    @import "/fonts/bootstrap-icons.min.css";
+
+    * { font-size: 12px; }
     table { width: 100%; }
     table th { text-align: center !important; }
+    .sort-active { opacity: 0.5; }
+    .sort-active:hover { opacity: 1; }
+    .pages-wrap {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .pages-info {
+        flex: 1 1 0px;
+    }
+    .pages-container {
+        display: flex;
+        gap: 0.15rem;
+        justify-content: end;
+        flex: 1 1 0px;
+    }
 </style>
 <div class="ddt-wrap">
     <div class="dtt-header">DTT Header</div>
     <div class="dtt-body">
         <table class="dtt-table table table-sm table-striped"></table>
     </div>
-    <div class="dtt-footer">DTT Footer</div>
+    <div class="dtt-footer"></div>
 </div>
 `;
 class DynamicDataTable extends HTMLElement {
+
+    //- Private Attibutes
+    #dynamicTable;
+    #header;
+    #footer;
+    #data;
+    #tableCaption;
+    #sortType = 1;
+
+    #actualPage = 1;
+    #pagesPerPage = 5;
+    #pageInit;
+    #pageLimit;
+
+    #rowsPerPage = 10;
+    #rowInit;
+    #rowLimit;
+
+    //- Public Attributes
+    $columnsDef = [];
+    $params;
 
     constructor() {
         super();
@@ -27,16 +67,9 @@ class DynamicDataTable extends HTMLElement {
         this._shadowRoot = this.attachShadow({ mode: 'open' });
         this._shadowRoot.appendChild(template.content.cloneNode(true));
 
-        //- Dynamic Table Obj
-        this.$dynamicTable = this._shadowRoot.querySelector('table');
-
-        //- Attributes
-        this.$columnsDef = [];
-        this.$params;
-
-        //- Variables
-        this.$data;
-        this.$tableCaption;
+        //- Component Objects
+        this.#dynamicTable = this._shadowRoot.querySelector('table');
+        this.#footer = this._shadowRoot.querySelector('.dtt-footer');
 
     }
 
@@ -62,25 +95,72 @@ class DynamicDataTable extends HTMLElement {
         return json;
     }
 
-    #_actionsButtons(id){
+    #_sortData(type, column) {
+        if (type == 1) {
+            if (typeof this.#data[0][column] === 'number') {
+                this.#data.sort((a, b) => a[column] - b[column]);
+            } else {
+                this.#data.sort((a, b) => a[column].localeCompare(b[column]));
+            }
+            this.#sortType = -1;
+        }
+
+        if (type == -1) {
+            if (typeof this.#data[0][column] === 'number') {
+                this.#data.sort((a, b) => b[column] - a[column]);
+            } else {
+                this.#data.sort((a, b) => b[column].localeCompare(a[column]));
+            }
+            this.#sortType = 1;
+        }
+    }
+
+    #_sortButton(column) {
+        let active = this.$columnsDef[this.$params.sortByColumn].data;
+        let i = document.createElement('i');
+        (column === active) ? i.classList.add('bi', 'bi-arrow-down-up', 'sort-active') : i.classList.add('bi', 'bi-arrow-down-up');
+        i.style.marginLeft = '3px';
+        i.style.cursor = 'pointer';
+        i.addEventListener('click', () => {
+            this.$params.sortByColumn = this.$columnsDef.findIndex(element => element.data === column);
+            this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+            this.#_drawTable();
+        });
+        return i;
+    }
+
+    #_actionsButtons(id) {
         let actionButtons = document.createElement('div');
         actionButtons.classList.add('btn-group');
         actionButtons.setAttribute('role', 'group');
 
         //- Info Button
         let btnInfo = document.createElement('button');
-        btnInfo.textContent = 'info';
+        btnInfo.classList.add('btn', 'btn-sm', 'btn-primary');
+        btnInfo.innerHTML = '<i class="bi bi-info-square"></i>';
         btnInfo.addEventListener('click', function (e) { console.log(id) });
 
         //- Edit Button
         let btnEdit = document.createElement('button');
-        btnEdit.textContent = 'edit';
-        btnEdit.addEventListener('click', function (e) { console.log(id) });
+        btnEdit.classList.add('btn', 'btn-sm', 'btn-success');
+        btnEdit.innerHTML = '<i class="bi bi-pencil-square"></i>';
+        btnEdit.addEventListener('click', function (e) {
+            //- TODO Dynamic message
+            if (window.confirm('Do you really want to EDIT this row?')) {
+                console.log(id);
+            }
+        });
 
         //- Delete Button
         let btnDelete = document.createElement('button');
-        btnDelete.textContent = 'Delete';
-        btnDelete.addEventListener('click', function (e) { console.log(id) });
+        btnDelete.classList.add('btn', 'btn-sm', 'btn-danger');
+        btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
+        btnDelete.addEventListener('click', function (e) {
+            //- TODO Dynamic message
+            if (window.confirm('Do you really want to DELETE this row?')) {
+                console.log(id);
+            }
+        });
 
         actionButtons.appendChild(btnInfo);
         actionButtons.appendChild(btnEdit);
@@ -125,127 +205,214 @@ class DynamicDataTable extends HTMLElement {
 
     #_formatData() {
         let formatedData = [];
-        for (const row of this.$data) {
+        for (const row of this.#data) {
             let object = {};
             for (const colDef of this.$columnsDef) {
                 object[colDef.data] = this.#_formatType(colDef.type, row[colDef.data]);
             }
             formatedData.push(object);
         }
-        this.$data = formatedData;
+        return formatedData;
     }
 
     #_drawTable() {
 
+        let tableData = this.#data;
+
         if (this.$columnsDef.length > 0) {
-            this.#_formatData();
+            tableData = this.#_formatData();
         }
 
-        console.log(this.$params);
-        console.log(this.$data);
+        this.#_drawPagination();
 
         // Clear Table Content
-        this.$dynamicTable.innerHTML = '';
+        this.#dynamicTable.innerHTML = '';
+
         // Draw Table Content
-        for (const index in this.$data) {
+        for (let index = this.#rowInit; index <= this.#rowLimit; index++) {
 
-            let row = this.$dynamicTable.insertRow(index);
-
+            let row = this.#dynamicTable.insertRow();
             if (this.$columnsDef.length > 0) {
                 for (const column of this.$columnsDef) {
 
                     let cell = row.insertCell();
 
                     if (column.type === 'date') {
-                        cell.textContent = this.#_formatDate(this.$data[index][column.data]);
+                        cell.textContent = this.#_formatDate(tableData[index][column.data]);
                     } else {
-                        cell.textContent = this.$data[index][column.data];
+                        cell.textContent = tableData[index][column.data];
                     }
 
                     if (column.type === 'currency') {
-                        this.$dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.textAlign = 'right';
+                        this.#dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.textAlign = 'right';
                     } else {
-                        this.$dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.textAlign = 'center';
+                        this.#dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.textAlign = 'center';
                     }
 
                     if (column.hasOwnProperty('render')) {
                         if (column.render.hasOwnProperty('show')) {
-                            this.$dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.display = 'none';
+                            this.#dynamicTable.rows[row.rowIndex].cells[cell.cellIndex].style.display = 'none';
                         };
                     };
 
                 }
             } else {
-                for (const key in this.$data[index]) {
-                    row.insertCell().textContent = this.$data[index][key];
+                for (const key in tableData[index]) {
+                    row.insertCell().textContent = tableData[index][key];
                 }
             }
 
-            if(this.$params.hasOwnProperty('showActions')){
-                if(this.$params.showActions){
-                    row.insertCell().appendChild(this.#_actionsButtons(this.$data[index]['_id']));
+            if (this.$params.hasOwnProperty('showActions')) {
+                if (this.$params.showActions) {
+                    row.insertCell().appendChild(this.#_actionsButtons(tableData[index]['_id']));
                 }
             }
-
         }
 
         // Add Columns Headers to Table
-        const tHead = this.$dynamicTable.createTHead().insertRow(0);
+        const trHead = this.#dynamicTable.createTHead().insertRow(0);
         if (this.$columnsDef.length > 0) {
             for (const column of this.$columnsDef) {
-
-                let cell = tHead.insertCell();
-
+                let th = document.createElement('th');
+                th.textContent = column.name.toUpperCase();
                 if (column.hasOwnProperty('render')) {
                     if (column.render.hasOwnProperty('show')) {
-                        cell.outerHTML = `<th style="display: none;">${column.name.toUpperCase()}</th>`;
-                    };
+                        th.classList.add('d-none');
+                    }
                 }
-
-                cell.outerHTML = `<th>${column.name.toUpperCase()}</th>`;
-
+                if (this.$params.hasOwnProperty('showSorting')) {
+                    if (this.$params.showSorting) {
+                        let sortIcon = this.#_sortButton(column.data);
+                        th.appendChild(sortIcon);
+                    }
+                }
+                trHead.appendChild(th);
             }
-        } else {
-            for (const key in this.$data[0]) {
-                tHead.insertCell().outerHTML = `<th>${key.toUpperCase()}</th>`;
+            if (this.$params.hasOwnProperty('showActions')) {
+                if (this.$params.showActions) {
+                    let th = document.createElement('th');
+                    trHead.appendChild(th);
+                }
             }
         }
 
+    }
+
+    #_drawPagination() {
+        this.#footer.innerHTML = '';
+        let pagesWrap = document.createElement('div');
+
+        let pagesInfo = document.createElement('div');
+        let pagesContainer = document.createElement('div');
+
+        let pages = (this.#data.length >= this.#rowsPerPage) ? Math.ceil(this.#data.length / this.#rowsPerPage) : 1;
+        (this.#actualPage < 1) ? this.#actualPage = 1 : (this.#actualPage > pages) ? pages : this.#actualPage;
+
+        this.#pageInit = (pages <= this.#pagesPerPage) ? 1 : (this.#actualPage <= Math.floor(this.#pagesPerPage / 2)) ? 1 : ((this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1)) >= pages) ? pages - this.#pagesPerPage + 1 : this.#actualPage - Math.floor(this.#pagesPerPage / 2);
+
+        this.#pageLimit = (pages <= this.#pagesPerPage) ? pages : (this.#actualPage <= Math.floor(this.#pagesPerPage / 2)) ? this.#pagesPerPage : ((this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1)) >= pages) ? pages : this.#actualPage + (Math.ceil(this.#pagesPerPage / 2) - 1);
+        
+        let drawPages = Array.from(Array((this.#pageLimit + 1) - this.#pageInit).keys()).map(i => this.#pageInit + i);
+
+        this.#rowInit = (this.#actualPage == 1) ? 0 : (this.#actualPage * this.#rowsPerPage) - this.#rowsPerPage;
+        this.#rowLimit = (this.#actualPage == 1) ? this.#rowsPerPage - 1 : (((this.#actualPage * this.#rowsPerPage) - 1) >= this.#data.length) ? this.#data.length - 1 : ((this.#actualPage * this.#rowsPerPage) - 1);    
+
+        for (const page of drawPages){
+            let btn = document.createElement('button');
+                btn.classList.add('btn', 'btn-sm');
+                (this.#actualPage == page) ? btn.classList.add('btn-secondary') : btn.classList.add('btn-primary');
+                btn.textContent = page;
+                btn.addEventListener('click', (e) => {
+                    this.#actualPage = page;
+                    this.#_drawTable();
+                });
+
+                pagesContainer.appendChild(btn);
+        }
+
+        //- Next button
+        if (drawPages[this.#pagesPerPage-1] < pages) {
+            let btn = document.createElement('button');
+            btn.classList.add('btn', 'btn-sm', 'btn-light');
+            btn.textContent = ">>";
+            btn.addEventListener('click', (e) => {
+                this.#actualPage = this.#actualPage + 1;
+                this.#_drawTable();
+            });
+            pagesContainer.append(btn);
+        }
+
+        //- Prev button
+        if (this.#actualPage > 1) {
+            let btn = document.createElement('button');
+            btn.classList.add('btn', 'btn-sm', 'btn-light');
+            btn.textContent = "<<";
+            btn.addEventListener('click', (e) => {
+                this.#actualPage = this.#actualPage - 1;
+                this.#_drawTable();
+            });
+            pagesContainer.prepend(btn);
+        }
+
+        pagesInfo.innerHTML = `<span>Total registros: ${this.#data.length} - Total paginas: ${pages}`;
+
+        pagesInfo.classList.add('pages-info');
+        pagesContainer.classList.add('pages-container');
+        pagesWrap.classList.add('pages-wrap');
+
+        pagesWrap.appendChild(pagesInfo);
+        pagesWrap.appendChild(pagesContainer);
+
+        this.#footer.appendChild(pagesWrap);
     }
 
     async #_loadData(url) {
         let result = await this.#_getData(url);
         if (Object.keys(result).length > 1) {
             if (result.success == true) {
-                this.$data = result[Object.keys(result)[1]];
-                this.$tableCaption = Object.keys(result)[1];
+                this.#data = result[Object.keys(result)[1]];
+                this.#tableCaption = Object.keys(result)[1];
+
+                if (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn')) {
+                    this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                }
+
                 this.#_drawTable();
+
             } else {
-                this.$dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
+                this.#dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
             }
         } else if (result[Object.keys(result)[0]].length > 0) {
-            this.$data = result[Object.keys(result)[0]];
-            this.$tableCaption = Object.keys(result)[0];
+            this.#data = result[Object.keys(result)[0]];
+            this.#tableCaption = Object.keys(result)[0];
+
+            if (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn')) {
+                this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+            }
+
             this.#_drawTable();
+
+            if (this.$params.hasOwnProperty('showPagination')) {
+                if (this.$params.showPagination) {
+                    this.#_drawPagination();
+                }
+            }
         } else {
-            this.$dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
+            this.#dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
         }
     }
 
     connectedCallback() {
-        //- console.log(`${this._componentName} - ${this._componentVersion} connected!`);
         if (this.hasAttribute('settings')) {
             this.$params = JSON.parse(this.settings);
         }
     }
 
     attributeChangedCallback(name) {
-        //- console.log(`Attribute ${name} was changed!`);
         if (name === 'data-source') {
             this.#_loadData(this.dataSource);
         }
         if (name === 'columns-def') {
-            ;
             this.$columnsDef = (JSON.parse(this.columnsDef));
         }
     }

@@ -25,6 +25,8 @@ app.use(express.static(path.join(__dirname, 'public/')));
 
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
 app.use('/js', express.static(__dirname + '/node_modules/bootstrap/dist/js'));
+app.use('/fonts', express.static(__dirname + '/node_modules/bootstrap-icons/font'));
+
 app.use('/css', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/css'));
 app.use('/js', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/js'));
 app.use('/webfonts', express.static(__dirname + '/node_modules/@fortawesome/fontawesome-free/webfonts'));
@@ -99,6 +101,10 @@ app.get('/base-web-component', (req, res, next) => {
     res.render('bwc', { title: 'Base Webcomponent' });
 });
 
+app.get('/lab/base-web-component/', (req, res, next) => {
+    res.render('base-web-component-lab', { title: 'Lab - Base WebComponent' });
+});
+
 app.get('/dynamic-data-table', (req, res, next) => {
     res.render('dynamic-data-table', { title: 'Dynamic Data Table' });
 });
@@ -134,7 +140,7 @@ app.get('/items/list', async (req, res, next) => {
 
 app.get('/invoices/list', async (req, res, next) => {
     let invoices = [];
-    let data = await Order.find({ active: true, date: { $gte: new Date('2023-11-01') } }).populate('doc');
+    let data = await Order.find({ active: true, date: { $gte: new Date('2023-01-01') } }).populate('doc');
     //- let data = await Order.find({ active: true }).populate('doc');
     //- console.log(data[0]);
     for (const invoice of data) {

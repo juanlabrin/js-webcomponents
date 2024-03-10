@@ -1,4 +1,4 @@
-class BaseWebcomponent extends HTMLElement {
+class BaseWebComponent extends HTMLElement {
     constructor() {
         super();
 
@@ -39,4 +39,4 @@ class BaseWebcomponent extends HTMLElement {
     }
 }
 
-window.customElements.define('base-webcomponent', BaseWebcomponent);
+window.customElements.define('base-webcomponent', BaseWebComponent);
