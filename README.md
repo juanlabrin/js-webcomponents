@@ -1,7 +1,7 @@
 <h1>JavaScript Vanilla - Web Components.</h1>
 <h3>My components are a set of a web components in pure vanilla JavaScript</h3>
 <ul>
-    <li>Dynamic Data Table</li>
+    <li><a href="https://github.com/juanlabrin/js-webcomponents/tree/master/public/js/dynamic-data-table">Dynamic Data Table</a></li>
     <li>Dynamic Tasks Table</li>
     <li>Rich Text Editor</li>
     <li>Action Button</li>
