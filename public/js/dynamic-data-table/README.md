@@ -9,13 +9,13 @@
 <p>It has only one required attribute 'data-source'.
 
 ```html
-<dynamic-data-table data-source="/path-to/data-source.json">
+<dynamic-data-table id="ddt" data-source="/path-to/data-source.json">
 ```
 </p>
 <p>You can define the configuration and the columns definitions, like this:</p>
 
 ```html
-<!-->Include the component<-->
+<!-- Include the component -->
 <script>type='module', src='/js/dynamic-data-table/dynamic-data-table-2024.class.js'</script>
 ```
 
