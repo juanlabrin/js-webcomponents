@@ -1,32 +1,23 @@
 const template = document.createElement('template');
 template.innerHTML = `
 <style>
-
     @import "/css/bootstrap.min.css";
     @import "/fonts/bootstrap-icons.min.css";
-
     * { font-size: 12px; }
     table { width: 100%; }
     table th { text-align: center !important; }
     .sort-active { opacity: 0.5; }
     .sort-active:hover { opacity: 1; }
-    .pages-wrap {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-    }
-    .pages-info {
-        flex: 1 1 0px;
-    }
-    .pages-container {
-        display: flex;
-        gap: 0.15rem;
-        justify-content: end;
-        flex: 1 1 0px;
-    }
+    .header-wrap, .pages-wrap { display: flex; flex-direction: row; align-items: center; }
+    .header-wrap { margin-bottom: 1.25rem; }
+    .header-search, .pages-info { flex: 1 1 0px; }
+    .rows-option-group { flex: 0 1 20%; }
+    .pages-container { display: flex; gap: 0.15rem; justify-content: end; flex: 1 1 0px; }
 </style>
 <div class="ddt-wrap">
-    <div class="dtt-header">DTT Header</div>
+    <div class="dtt-header">
+        <div class="header-wrap"></div>
+    </div>
     <div class="dtt-body">
         <table class="dtt-table table table-sm table-striped"></table>
     </div>
@@ -69,6 +60,7 @@ class DynamicDataTable extends HTMLElement {
 
         //- Component Objects
         this.#dynamicTable = this._shadowRoot.querySelector('table');
+        this.#header = this._shadowRoot.querySelector('.dtt-header');
         this.#footer = this._shadowRoot.querySelector('.dtt-footer');
 
     }
@@ -233,7 +225,7 @@ class DynamicDataTable extends HTMLElement {
             }
         }
 
-        console.log(this.#rowInit, this.#rowLimit);
+        //- console.log(this.#rowInit, this.#rowLimit);
 
         // Draw Table Content
         for (let index = this.#rowInit; index <= this.#rowLimit; index++) {
@@ -372,6 +364,39 @@ class DynamicDataTable extends HTMLElement {
         pagesWrap.appendChild(pagesContainer);
 
         this.#footer.appendChild(pagesWrap);
+
+        //- Add Select Pages Per Row Element        
+        let headerWrap = this.#header.querySelector('.header-wrap');
+        headerWrap.innerHTML = '';
+        let rowsOptionGroup = document.createElement('div');
+        let rowsOptionText = document.createElement('div');
+        let pagesPerRowEl = document.createElement('select');
+        let rowsOpions = [10, 20, 30, 50, 100];
+
+        for (const rows of rowsOpions){
+            let option = document.createElement('option');
+            option.value = rows;
+            option.textContent = rows;
+            if(rows == this.#rowsPerPage){
+                option.selected = true;
+            }
+            pagesPerRowEl.appendChild(option);
+        }
+        pagesPerRowEl.addEventListener('change', () => {
+            console.log(pagesPerRowEl.value);
+            this.#rowsPerPage = parseInt(pagesPerRowEl.value);
+            this.#_drawTable();
+        });
+
+        pagesPerRowEl.classList.add('form-control');
+        rowsOptionText.textContent = "Registros por página";
+        rowsOptionText.classList.add('input-group-text');
+        rowsOptionGroup.classList.add('input-group', 'rows-option-group');
+
+        rowsOptionGroup.appendChild(rowsOptionText);
+        rowsOptionGroup.appendChild(pagesPerRowEl);
+        headerWrap.appendChild(rowsOptionGroup);
+
     }
 
     async #_loadData(url) {
