@@ -9,7 +9,7 @@
 <p>It has only one required attribute 'data-source'.
 
 ```html
-<dynamic-data-table data-source="/path/to-data-source">
+<dynamic-data-table data-source="/path-to/data-source.json">
 ```
 </p>
 <p>You can define the configuration and the columns definitions, like this:</p>
