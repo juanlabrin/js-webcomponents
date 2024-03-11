@@ -52,7 +52,7 @@ ddt.setAttribute('settings', JSON.stringify(ddtParams));
 ddt.setAttribute('columns-def', JSON.stringify(ddtColDef));
 ddt.setAttribute('data-source', ddtDataSource);
 ```
-<h4>Note:</h4>
+<h4>Notes:</h4>
 <ul>
 <li><strong>dynamic-data-table-2023.class.js</strong> is completely functional</li>
 <li><strong>dynamic-data-table-2024.class.js</strong> is under development and improvement</li>
