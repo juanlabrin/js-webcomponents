@@ -53,5 +53,5 @@ ddt.setAttribute('data-source', ddtDataSource);
 <ul>
 <li><strong>dynamic-data-table-2023.class.js</strong> is completely functional</li>
 <li><strong>dynamic-data-table-2024.class.js</strong> is under development and improvement</li>
-<li>in the folder previuos-versions there are previous versions also functional.</li>
+<li>in the folder previous-versions there are previous versions also functional.</li>
 </ul>
