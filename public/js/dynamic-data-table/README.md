@@ -1,4 +1,5 @@
-<h2>Basic setup and use.</h2>
+<h2>Dynamic Data Table - JavaScript Web Component</h2>
+<h3>Basic setup and use.</h3>
 <p>The component needs a JSON data source, either in a file or from a database or API, the data may or may not be formatted.</p>
 <p>You must create a tag in the file that will contain the component named:</p>
 
@@ -56,4 +57,5 @@ ddt.setAttribute('data-source', ddtDataSource);
 <li><strong>dynamic-data-table-2023.class.js</strong> is completely functional</li>
 <li><strong>dynamic-data-table-2024.class.js</strong> is under development and improvement</li>
 <li>in the folder previous-versions there are previous versions also functional.</li>
+<li><strong>The component uses Bootstrap as a CSS library for its visual formatting, but you can use your own library or add your own CSS rules.</strong></li>
 </ul>
