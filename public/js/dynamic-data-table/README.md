@@ -1,14 +1,15 @@
 <h2>Basic setup and use.</h2>
 <p>The component needs a JSON data source, either in a file or from a database or API, the data may or may not be formatted.</p>
-<p>You must create a tag in the file that will contain the component named 
-    <code>
-        &#60;dynamic-data-table&#62; 
-    </code>
-</p>
+<p>You must create a tag in the file that will contain the component named:</p>
+
+```html
+    <dynamic-data-table>
+```
 <p>It has only one required attribute 'data-source'.
-<code>
-    &#60;dynamic-data-table data-source="/path/to-data-source"&#62;
-</code>
+
+```html
+<dynamic-data-table data-source="/path/to-data-source">
+```
 </p>
 <p>You can define the configuration and the columns definitions, like this:</p>
 
@@ -43,6 +44,7 @@
 
     var ddtDataSource = "/invoices/list";
 
+    //- Initializes the component
     ddt.setAttribute('settings', JSON.stringify(ddtParams));
     ddt.setAttribute('columns-def', JSON.stringify(ddtColDef));
     ddt.setAttribute('data-source', ddtDataSource);
