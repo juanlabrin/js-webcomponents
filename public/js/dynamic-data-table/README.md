@@ -21,6 +21,8 @@
 ```javascript
 //- Set the component
 const ddt = document.getElementById('ddt');
+
+//- You can include or not the parameters, if you do not include them the component will assign them their default values (false or true).
 var ddtParams = {
     showSorting: true,
     sortByColumn: 3,
