@@ -30,7 +30,7 @@ var ddtParams = {
     showActions: true
 };
 
-//- Define columns (data/type/name)
+//- Define columns (data/type/name/render{show, sort})
 var ddtColDef = [
     {data:"_id", type:"string", name:"id", render: {show: false, sort: false}}, //- Required for actions buttons (name:"id")
     {data:"number", type:"number", name:"numero", render: {sort: true}},
