@@ -16,5 +16,5 @@
 
 ```html
 <!-- Include the component -->
-<script>type='module', src='/js/dynamic-data-table/dynamic-tasks-table-2024.class.js'</script>
+<script type='module', src='/js/dynamic-data-table/dynamic-tasks-table-2024.class.js'></script>
 ```
