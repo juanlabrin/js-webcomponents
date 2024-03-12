@@ -5,6 +5,8 @@ template.innerHTML = `
 @import "/css/all.css";
 @import "/css/bootstrap.min.css";
 
+* { font-size: 12px; }
+
 .task-title {
     padding: 5px 3px 3px 5px;
     background-color: #FFF;
@@ -557,7 +559,7 @@ class DynamicTasksTable extends HTMLElement {
     }
 
     _drawTable(data) {
-        // console.log(data);
+        //- console.log(data);
         this.$filterBox.innerHTML = '';
         this.$dynamicTable.innerHTML = '';
 
@@ -609,7 +611,7 @@ class DynamicTasksTable extends HTMLElement {
     }
 
     _loadData(url, showMessageBox = true) {
-        // console.log(url);
+        //- console.log(url);
         fetch(url)
             .then(res => {
                 if (res.ok) {
@@ -617,7 +619,7 @@ class DynamicTasksTable extends HTMLElement {
                 }
             })
             .then(json => {
-                // console.log(json);
+                //- console.log(json);
                 if (json.success) {
                     this._drawTable(json.data);
                     if (showMessageBox) {
