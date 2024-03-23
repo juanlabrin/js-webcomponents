@@ -172,6 +172,7 @@ class TimelineTaskBox extends HTMLElement {
                 task.style.gridColumnStart = t.lineStart;
                 task.style.gridColumnEnd = t.lineEnd;
                 task.style.backgroundColor = t.task.taskColor;
+                task.style.cursor = 'pointer';
 
 
                 taskStatus.classList.add('status-badge');
@@ -220,13 +221,13 @@ class TimelineTaskBox extends HTMLElement {
         let btnPrevDay = document.createElement('button');
         btnPrevDay.setAttribute('rel', prevDay);
         btnPrevDay.innerHTML = '&#x276E;';
-        btnPrevDay.addEventListener('click', (e) => { this._proccesData(new Date(prevDay), this.$data); });
+        btnPrevDay.addEventListener('click', (e) => { this._processData(new Date(prevDay), this.$data); });
         this.$prevDay.appendChild(btnPrevDay);
 
         let btnNextDay = document.createElement('button');
         btnNextDay.setAttribute('rel', nextDay);
         btnNextDay.innerHTML = '&#x276F;';
-        btnNextDay.addEventListener('click', (e) => { this._proccesData(new Date(nextDay), this.$data); });
+        btnNextDay.addEventListener('click', (e) => { this._processData(new Date(nextDay), this.$data); });
         this.$nextDay.appendChild(btnNextDay);
     }
 
@@ -262,7 +263,7 @@ class TimelineTaskBox extends HTMLElement {
             weeksWithTasks.push({ text: `Week [${this._formatDate(undefined, week[0].toUTCString())} - ${this._formatDate(undefined, week[6].toUTCString())}]`, date: date.split('T')[0] });
         }
 
-        console.log(weeksWithTasks);
+        //- console.log(weeksWithTasks);
 
         let filtered = weeksWithTasks.filter(function ({ text }) {
             var key = `${text}`;
@@ -279,7 +280,7 @@ class TimelineTaskBox extends HTMLElement {
         this.$weeksWithTasks.addEventListener('change', (e) => {
             e.preventDefault();
             if(this.$weeksWithTasks.value != ''){
-                this._proccesData(new Date(this.$weeksWithTasks.value), this.$data);
+                this._processData(new Date(this.$weeksWithTasks.value), this.$data);
             }            
         });
 
@@ -292,7 +293,7 @@ class TimelineTaskBox extends HTMLElement {
         this.$drawOptionWeeks = false;
     }
 
-    _proccesData(date, data) {
+    _processData(date, data) {
         let currentWeek = this._getWeekDates(date);
         let tasksInCurrentWeek = [];
 
@@ -320,14 +321,14 @@ class TimelineTaskBox extends HTMLElement {
 
         this._drawTimeline(tasksInCurrentWeek, currentWeek);
         this._setPrevNextArrows(currentWeek);
-        this.$monthName.textContent = this.$months[new Date(date).getUTCMonth()];
+        this.$monthName.textContent = `${this.$months[new Date(date).getUTCMonth()]} - ${new Date(date).getUTCFullYear()}`;
     }
 
     async _loadData(dataSource) {
         let response = await this._getData(dataSource);
         if (response.success) {
             this.$data = response.data;
-            this._proccesData(this.$date, this.$data);
+            this._processData(this.$date, this.$data);
         }
     }
 
