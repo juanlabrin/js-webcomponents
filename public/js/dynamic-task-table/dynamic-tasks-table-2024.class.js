@@ -653,8 +653,11 @@ class DynamicTasksTable extends HTMLElement {
                 if (json.success) {
                     console.log(json);
                     this.refresh(false);
+                    this.$messageBox.innerHTML = json.message;
+                    this.$messageBox.classList.remove('d-none');
                 } else {
                     this.$messageBox.innerHTML = json.message;
+                    this.$messageBox.classList.remove('d-none');
                 }
             });
     }
