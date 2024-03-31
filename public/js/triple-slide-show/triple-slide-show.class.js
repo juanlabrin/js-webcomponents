@@ -12,27 +12,38 @@ template.innerHTML = `
         }
         .tss-box {
             display: grid; 
-            width: 800px; 
-            height: 400px; 
-            grid-template-columns: [lcol] 60% [rcol] 40%; 
-            grid-template-rows: [trow] 50% [brow] 50%; 
-            gap: 1rem;
+            height: 300px;
             margin-bottom: 1rem;
         }
         .item-a, .item-b, .item-c {
             position: relative;
             background-color: lightgray;
         }
+        .item-b, .item-c {
+            display: none;
+        }
 
     }
 
     @media(min-width: 760px){
+
+        .tss-box {
+            width: 800px; 
+            height: 400px; 
+            grid-template-columns: [lcol] 60% [rcol] 40%; 
+            grid-template-rows: [trow] 50% [brow] 50%; 
+            gap: 1rem;
+        }
 
         .item-a {
             grid-column-start: 1;
             grid-column-end: 2;
             grid-row-start: 1;
             grid-row-end: 3;
+        }
+
+        .item-b, .item-c {
+            display: block;
         }
 
     }
