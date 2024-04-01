@@ -28,8 +28,8 @@ template.innerHTML = `
     @media(min-width: 760px){
 
         .tss-box {
-            width: 800px; 
-            height: 400px; 
+            width: 700px; 
+            height: 350px; 
             grid-template-columns: [lcol] 60% [rcol] 40%; 
             grid-template-rows: [trow] 50% [brow] 50%; 
             gap: 1rem;
@@ -166,7 +166,11 @@ class TripleSlideShow extends HTMLElement {
             for (let j = 0; j < this.$images.length; j++) {
                 let img = new Image();
                 img.src = `${this.$path}${this.$images[j]}`;
-                this.#items[i].appendChild(img.cloneNode(true));
+                img.style.cursor = 'pointer';
+                img.addEventListener('click', (e) => {
+                    document.location = '#products';
+                });
+                this.#items[i].appendChild(img);
             }
 
             this.$images.push(this.$images.splice(0, 1)[0]);
