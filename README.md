@@ -7,6 +7,7 @@
     <li><a href="https://github.com/juanlabrin/js-webcomponents/tree/master/public/js/load-button">Load/Action Button</a></li>
     <li><a href="https://github.com/juanlabrin/js-webcomponents/tree/master/public/js/search-action-box">Search Action Box</a></li>
     <li><a href="https://github.com/juanlabrin/js-webcomponents/tree/master/public/js/timeline-task-box">Timeline Task Box</a></li>
+    <li><a href="https://github.com/juanlabrin/js-webcomponents/tree/master/public/js/triple-slide-show">Triple Slide Show</a></li>
 </ul>
 <p>These components are in constant development and better, there are previous versions inside the folders of each one fully functional. They are NOT PERFECT but they are simple to use and efficient in many cases.</p>
 <blockquote>
