@@ -219,7 +219,7 @@ class DynamicDataTable extends HTMLElement {
         // Clear Table Content
         this.#dynamicTable.innerHTML = '';
 
-        if (this.$params.hasOwnProperty('showPagination')) {
+        if (this.$params != undefined && this.$params.hasOwnProperty('showPagination')) {
             if (this.$params.showPagination) {
                 this.#_drawPagination();
             }
@@ -262,7 +262,7 @@ class DynamicDataTable extends HTMLElement {
                 }
             }
 
-            if (this.$params.hasOwnProperty('showActions')) {
+            if (this.$params != undefined && this.$params.hasOwnProperty('showActions')) {
                 if (this.$params.showActions) {
                     row.insertCell().appendChild(this.#_actionsButtons(tableData[index]['_id']));
                 }
@@ -402,12 +402,16 @@ class DynamicDataTable extends HTMLElement {
     async #_loadData(url) {
         let result = await this.#_getData(url);
 
+        console.log(result);
+        console.log(this.$params);
+
         if (Object.keys(result).length > 1) {
+
             if (result.success == true) {
                 this.#data = result[Object.keys(result)[1]];
                 this.#tableCaption = Object.keys(result)[1];
 
-                if (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn')) {
+                if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
                     this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
                 }
 
@@ -416,11 +420,13 @@ class DynamicDataTable extends HTMLElement {
             } else {
                 this.#dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
             }
+
         } else if (result[Object.keys(result)[0]].length > 0) {
+
             this.#data = result[Object.keys(result)[0]];
             this.#tableCaption = Object.keys(result)[0];
 
-            if (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn')) {
+            if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
                 this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
             }
 
