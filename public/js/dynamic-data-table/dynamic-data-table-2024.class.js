@@ -271,7 +271,7 @@ class DynamicDataTable extends HTMLElement {
 
         // Add Columns Headers to Table
         const trHead = this.#dynamicTable.createTHead().insertRow(0);
-        if (this.$columnsDef.length > 0) {
+        if (this.$columnsDef != undefined && this.$columnsDef.length > 0) {
             for (const column of this.$columnsDef) {
                 let th = document.createElement('th');
                 th.textContent = column.name.toUpperCase();
@@ -412,7 +412,9 @@ class DynamicDataTable extends HTMLElement {
                 this.#tableCaption = Object.keys(result)[1];
 
                 if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
-                    this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                    if(this.$columnsDef.length > 0){
+                        this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                    }
                 }
 
                 this.#_drawTable();
@@ -427,7 +429,9 @@ class DynamicDataTable extends HTMLElement {
             this.#tableCaption = Object.keys(result)[0];
 
             if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
-                this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                if(this.$columnsDef.length > 0){
+                    this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                }                
             }
 
             this.#_drawTable();
