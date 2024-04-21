@@ -108,16 +108,19 @@ class DynamicDataTable extends HTMLElement {
     }
 
     #_sortButton(column) {
-        let active = this.$columnsDef[this.$params.sortByColumn].data;
+        let active = (this.$columnsDef.length > 0) ? this.$columnsDef[this.$params.sortByColumn].data : '_id';
         let i = document.createElement('i');
+
         (column === active) ? i.classList.add('bi', 'bi-arrow-down-up', 'sort-active') : i.classList.add('bi', 'bi-arrow-down-up');
         i.style.marginLeft = '3px';
         i.style.cursor = 'pointer';
+
         i.addEventListener('click', () => {
             this.$params.sortByColumn = this.$columnsDef.findIndex(element => element.data === column);
             this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
             this.#_drawTable();
         });
+        
         return i;
     }
 
@@ -271,7 +274,8 @@ class DynamicDataTable extends HTMLElement {
 
         // Add Columns Headers to Table
         const trHead = this.#dynamicTable.createTHead().insertRow(0);
-        if (this.$columnsDef != undefined && this.$columnsDef.length > 0) {
+
+        if (this.$columnsDef.length > 0) {
             for (const column of this.$columnsDef) {
                 let th = document.createElement('th');
                 th.textContent = column.name.toUpperCase();
@@ -293,6 +297,18 @@ class DynamicDataTable extends HTMLElement {
                     let th = document.createElement('th');
                     trHead.appendChild(th);
                 }
+            }
+        } else {
+            for (const key in tableData[0]) {
+                let th = document.createElement('th');
+                th.textContent = key.toUpperCase();
+                if (this.$params != undefined && this.$params.hasOwnProperty('showSorting')) {
+                    if (this.$params.showSorting) {
+                        let sortIcon = this.#_sortButton(key);
+                        th.appendChild(sortIcon);
+                    }
+                }
+                trHead.appendChild(th);
             }
         }
 
@@ -373,11 +389,11 @@ class DynamicDataTable extends HTMLElement {
         let pagesPerRowEl = document.createElement('select');
         let rowsOpions = [10, 20, 30, 50, 100];
 
-        for (const rows of rowsOpions){
+        for (const rows of rowsOpions) {
             let option = document.createElement('option');
             option.value = rows;
             option.textContent = rows;
-            if(rows == this.#rowsPerPage){
+            if (rows == this.#rowsPerPage) {
                 option.selected = true;
             }
             pagesPerRowEl.appendChild(option);
@@ -402,8 +418,8 @@ class DynamicDataTable extends HTMLElement {
     async #_loadData(url) {
         let result = await this.#_getData(url);
 
-        console.log(result);
-        console.log(this.$params);
+        //- console.log(result);
+        //- console.log(this.$params);
 
         if (Object.keys(result).length > 1) {
 
@@ -412,7 +428,7 @@ class DynamicDataTable extends HTMLElement {
                 this.#tableCaption = Object.keys(result)[1];
 
                 if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
-                    if(this.$columnsDef.length > 0){
+                    if (this.$columnsDef.length > 0) {
                         this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
                     }
                 }
@@ -429,9 +445,9 @@ class DynamicDataTable extends HTMLElement {
             this.#tableCaption = Object.keys(result)[0];
 
             if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
-                if(this.$columnsDef.length > 0){
+                if (this.$columnsDef.length > 0) {
                     this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
-                }                
+                }
             }
 
             this.#_drawTable();
