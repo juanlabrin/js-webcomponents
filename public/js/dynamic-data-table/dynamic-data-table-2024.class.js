@@ -453,11 +453,12 @@ class DynamicDataTable extends HTMLElement {
                     for(const col of Object.keys(this.#data[0])){
                         this.$columnsDef.push({
                             data: col,
-                            type: 'string',
+                            type: (isNaN(this.#data[0][col])) ? 'string' : 'number', //- Determine data type
                             name: col
                         });
                     }
                     this.#_sortData(this.#sortType, this.$columnsDef[0].data);
+                    //- console.log(this.$columnsDef);
                 }
             }
 
