@@ -116,11 +116,12 @@ class DynamicDataTable extends HTMLElement {
         i.style.cursor = 'pointer';
 
         i.addEventListener('click', () => {
+            //- TODO Fix When Columnsdef is zero
             this.$params.sortByColumn = this.$columnsDef.findIndex(element => element.data === column);
             this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
             this.#_drawTable();
         });
-        
+
         return i;
     }
 
@@ -177,6 +178,10 @@ class DynamicDataTable extends HTMLElement {
     }
 
     #_formatType(type, value) {
+        //- console.log(type, value);
+        if (value == null){
+            return value;
+        }
         if (typeof value != type) {
             if (type === 'date') {
                 value = new Date(value);
@@ -193,7 +198,6 @@ class DynamicDataTable extends HTMLElement {
                     value = num;
                 }
             }
-            // console.log(type, value);
         }
         return value;
     }
@@ -227,8 +231,6 @@ class DynamicDataTable extends HTMLElement {
                 this.#_drawPagination();
             }
         }
-
-        //- console.log(this.#rowInit, this.#rowLimit);
 
         // Draw Table Content
         for (let index = this.#rowInit; index <= this.#rowLimit; index++) {
@@ -418,8 +420,7 @@ class DynamicDataTable extends HTMLElement {
     async #_loadData(url) {
         let result = await this.#_getData(url);
 
-        //- console.log(result);
-        //- console.log(this.$params);
+        console.log(result);
 
         if (Object.keys(result).length > 1) {
 
@@ -447,23 +448,37 @@ class DynamicDataTable extends HTMLElement {
             if (this.$params != undefined && (this.$params.hasOwnProperty('showSorting') || this.$params.hasOwnProperty('sortByColumn'))) {
                 if (this.$columnsDef.length > 0) {
                     this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
+                } else {
+                    console.log(this.$columnsDef, Object.keys(this.#data[0]));
+                    for(const col of Object.keys(this.#data[0])){
+                        this.$columnsDef.push({
+                            data: col,
+                            type: 'string',
+                            name: col
+                        });
+                    }
+                    this.#_sortData(this.#sortType, this.$columnsDef[0].data);
                 }
             }
 
             this.#_drawTable();
 
         } else {
+
             this.#dynamicTable.insertRow().insertCell().textContent = 'Not data loaded!';
+
         }
     }
 
     connectedCallback() {
+        console.log('Component Connected!');
         if (this.hasAttribute('settings')) {
             this.$params = JSON.parse(this.settings);
         }
     }
 
     attributeChangedCallback(name) {
+        console.log('Component Attribute Changed!');
         if (name === 'data-source') {
             this.#_loadData(this.dataSource);
         }
