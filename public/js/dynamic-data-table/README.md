@@ -30,7 +30,8 @@ var ddtParams = {
     showCaption: true,
     showPagination: true,
     showSearching: true,
-    showActions: true
+    showActions: true,
+    btnActionUrl: '/items/'
 };
 
 //- Define columns (data/type/name/render{show, sort})
