@@ -134,16 +134,20 @@ class DynamicDataTable extends HTMLElement {
         let btnInfo = document.createElement('button');
         btnInfo.classList.add('btn', 'btn-sm', 'btn-primary');
         btnInfo.innerHTML = '<i class="bi bi-info-square"></i>';
-        btnInfo.addEventListener('click', function (e) { console.log(id) });
+        btnInfo.addEventListener('click', (e) => { 
+            //- console.log(id);
+            window.location = `${this.$params.btnActionUrl}${id}/info`;
+        });
 
         //- Edit Button
         let btnEdit = document.createElement('button');
         btnEdit.classList.add('btn', 'btn-sm', 'btn-success');
         btnEdit.innerHTML = '<i class="bi bi-pencil-square"></i>';
-        btnEdit.addEventListener('click', function (e) {
+        btnEdit.addEventListener('click', (e) => {
             //- TODO Dynamic message
             if (window.confirm('Do you really want to EDIT this row?')) {
-                console.log(id);
+                //- console.log(id);
+                window.location = `${this.$params.btnActionUrl}${id}/edit`;
             }
         });
 
@@ -151,10 +155,11 @@ class DynamicDataTable extends HTMLElement {
         let btnDelete = document.createElement('button');
         btnDelete.classList.add('btn', 'btn-sm', 'btn-danger');
         btnDelete.innerHTML = '<i class="bi bi-x-circle"></i>';
-        btnDelete.addEventListener('click', function (e) {
+        btnDelete.addEventListener('click', (e) => {
             //- TODO Dynamic message
             if (window.confirm('Do you really want to DELETE this row?')) {
-                console.log(id);
+                //- console.log(id);
+                window.location = `${this.$params.btnActionUrl}${id}/delete`;
             }
         });
 
