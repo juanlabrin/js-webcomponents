@@ -9,7 +9,7 @@ template.innerHTML = `
     .sort-active { opacity: 0.5; }
     .sort-active:hover { opacity: 1; }
     .header-wrap, .pages-wrap { display: flex; flex-direction: row; align-items: center; }
-    .header-wrap { margin-bottom: 1.25rem; }
+    .header-wrap { margin-bottom: 1.25rem; gap: 1rem; }
     .header-search, .pages-info { flex: 1 1 0px; }
     .rows-option-group { flex: 0 1 20%; }
     .pages-container { display: flex; gap: 0.15rem; justify-content: end; flex: 1 1 0px; }
@@ -87,6 +87,20 @@ class DynamicDataTable extends HTMLElement {
         return json;
     }
 
+    $_refresh() {
+        this.#_loadData(this.dataSource);
+    }
+
+    #_searchData(query) {
+        function notNUll(value){
+            //- console.log(value);
+            if(value && value !== null){
+                return value.toString().toLowerCase().includes(query.toString().toLowerCase());
+            }
+        }
+        return this.#data.filter((row) => Object.keys(row).some((key) => notNUll(row[key])));
+    }
+
     #_sortData(type, column) {
         if (type == 1) {
             if (typeof this.#data[0][column] === 'number') {
@@ -127,7 +141,7 @@ class DynamicDataTable extends HTMLElement {
 
     #_actionsButtons(id) {
         let actionButtons = document.createElement('div');
-        actionButtons.classList.add('btn-group');
+        actionButtons.classList.add('btn-group', 'float-end');
         actionButtons.setAttribute('role', 'group');
 
         //- Info Button
@@ -219,6 +233,57 @@ class DynamicDataTable extends HTMLElement {
         return formatedData;
     }
 
+    #_drawSearching() {
+        //- console.log('Show searching');
+        //- this.$searchBox.innerHTML = '';
+        let searchBox = document.createElement('div');
+        let inputQuery = document.createElement('input');
+        let btnSearch = document.createElement('button');
+        let btnRefresh = document.createElement('button');
+
+        searchBox.classList.add('input-group');
+        inputQuery.classList.add('form-control');
+
+        btnSearch.classList.add('btn', 'btn-primary');
+        btnSearch.textContent = 'Search';
+
+        btnSearch.addEventListener('click', (e) => {
+            e.preventDefault(e);
+
+            if (inputQuery.value === '') {
+                alert('Please fill the search input.');
+                inputQuery.focus();
+                return;
+            }
+
+            let result = this.#_searchData(inputQuery.value);
+
+            console.log(inputQuery.value, result);
+            this.#data = result;
+            this.#_drawTable();
+        });
+
+        btnRefresh.classList.add('btn', 'btn-secondary');
+        btnRefresh.innerHTML = '&#10227;';
+        btnRefresh.style.paddingLeft = '0.55rem';
+        btnRefresh.style.paddingRight = '0.55rem';
+        btnRefresh.style.paddingTop = '0';
+        btnRefresh.style.paddingBottom = '0';
+        btnRefresh.style.fontWeight = '500';
+        btnRefresh.style.fontSize = '1.75rem';
+        btnRefresh.style.lineHeight = '0';
+
+        btnRefresh.addEventListener('click', (e) => {
+            e.preventDefault(e);
+            this.$_refresh();
+        });
+
+        searchBox.appendChild(inputQuery);
+        searchBox.appendChild(btnSearch);
+        searchBox.appendChild(btnRefresh);
+        this.#header.querySelector('.header-wrap').appendChild(searchBox);
+    }
+
     #_drawTable() {
 
         let tableData = this.#data;
@@ -234,6 +299,12 @@ class DynamicDataTable extends HTMLElement {
         if (this.$params != undefined && this.$params.hasOwnProperty('showPagination')) {
             if (this.$params.showPagination) {
                 this.#_drawPagination();
+            }
+        }
+
+        if (this.$params != undefined && this.$params.hasOwnProperty('showSearching')) {
+            if (this.$params.showSearching){
+                this.#_drawSearching();
             }
         }
 
@@ -391,10 +462,11 @@ class DynamicDataTable extends HTMLElement {
         //- Add Select Pages Per Row Element        
         let headerWrap = this.#header.querySelector('.header-wrap');
         headerWrap.innerHTML = '';
+
         let rowsOptionGroup = document.createElement('div');
         let rowsOptionText = document.createElement('div');
         let pagesPerRowEl = document.createElement('select');
-        let rowsOpions = [10, 20, 30, 50, 100];
+        let rowsOpions = [10, 15, 30, 50, 100];
 
         for (const rows of rowsOpions) {
             let option = document.createElement('option');
@@ -406,12 +478,14 @@ class DynamicDataTable extends HTMLElement {
             pagesPerRowEl.appendChild(option);
         }
         pagesPerRowEl.addEventListener('change', () => {
-            console.log(pagesPerRowEl.value);
+            //- console.log(pagesPerRowEl.value);
             this.#rowsPerPage = parseInt(pagesPerRowEl.value);
             this.#_drawTable();
         });
 
+        pagesPerRowEl.dir = 'rtl';
         pagesPerRowEl.classList.add('form-control');
+        pagesPerRowEl.style.width = 'auto';
         rowsOptionText.textContent = "Registros por página";
         rowsOptionText.classList.add('input-group-text');
         rowsOptionGroup.classList.add('input-group', 'rows-option-group');
@@ -425,7 +499,7 @@ class DynamicDataTable extends HTMLElement {
     async #_loadData(url) {
         let result = await this.#_getData(url);
 
-        console.log(result);
+        //- console.log(result);
 
         if (Object.keys(result).length > 1) {
 
@@ -454,7 +528,7 @@ class DynamicDataTable extends HTMLElement {
                 if (this.$columnsDef.length > 0) {
                     this.#_sortData(this.#sortType, this.$columnsDef[this.$params.sortByColumn].data);
                 } else {
-                    console.log(this.$columnsDef, Object.keys(this.#data[0]));
+                    //- console.log(this.$columnsDef, Object.keys(this.#data[0]));
                     for(const col of Object.keys(this.#data[0])){
                         this.$columnsDef.push({
                             data: col,
