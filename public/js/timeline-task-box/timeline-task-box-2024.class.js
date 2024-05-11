@@ -327,6 +327,7 @@ class TimelineTaskBox extends HTMLElement {
     async _loadData(dataSource) {
         let response = await this._getData(dataSource);
         if (response.success) {
+            console.log(response);
             this.$data = response.data;
             this._processData(this.$date, this.$data);
         }

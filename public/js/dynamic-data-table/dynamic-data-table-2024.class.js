@@ -104,18 +104,38 @@ class DynamicDataTable extends HTMLElement {
     #_sortData(type, column) {
         if (type == 1) {
             if (typeof this.#data[0][column] === 'number') {
-                this.#data.sort((a, b) => a[column] - b[column]);
+                this.#data.sort((a, b) => {
+                    if(a[column] === null && b[column] === null) return 0;
+                    if(a[column] === null) return 1;
+                    if(b[column] === null) return -1;
+                    return a[column] - b[column];
+                });
             } else {
-                this.#data.sort((a, b) => a[column].localeCompare(b[column]));
+                this.#data.sort((a, b) => {
+                    if(a[column] === null && b[column] === null) return 0;
+                    if(a[column] === null) return 1;
+                    if(b[column] === null) return -1;
+                    return a[column].localeCompare(b[column]);
+                });
             }
             this.#sortType = -1;
         }
 
         if (type == -1) {
             if (typeof this.#data[0][column] === 'number') {
-                this.#data.sort((a, b) => b[column] - a[column]);
+                this.#data.sort((a, b) => {
+                    if(a[column] === null && b[column] === null) return 0;
+                    if(b[column] === null) return 1;
+                    if(a[column] === null) return -1;
+                    return b[column] - a[column];
+                });
             } else {
-                this.#data.sort((a, b) => b[column].localeCompare(a[column]));
+                this.#data.sort((a, b) => {
+                    if(a[column] === null && b[column] === null) return 0;
+                    if(b[column] === null) return 1;
+                    if(a[column] === null) return -1;
+                    return b[column].localeCompare(a[column]);
+                });
             }
             this.#sortType = 1;
         }
