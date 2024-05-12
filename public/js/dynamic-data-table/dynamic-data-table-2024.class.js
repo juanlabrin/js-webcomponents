@@ -429,8 +429,11 @@ class DynamicDataTable extends HTMLElement {
         let drawPages = Array.from(Array((this.#pageLimit + 1) - this.#pageInit).keys()).map(i => this.#pageInit + i);
 
         this.#rowInit = (this.#actualPage == 1) ? 0 : (this.#actualPage * this.#rowsPerPage) - this.#rowsPerPage;
-        this.#rowLimit = (this.#actualPage == 1) ? this.#rowsPerPage - 1 : (((this.#actualPage * this.#rowsPerPage) - 1) >= this.#data.length) ? this.#data.length - 1 : ((this.#actualPage * this.#rowsPerPage) - 1);
 
+        if(pages > 1){
+            this.#rowLimit = (this.#actualPage == 1) ? this.#rowsPerPage - 1 : (((this.#actualPage * this.#rowsPerPage) - 1) >= this.#data.length) ? this.#data.length - 1 : ((this.#actualPage * this.#rowsPerPage) - 1);
+        }
+        
         for (const page of drawPages) {
             let btn = document.createElement('button');
             btn.classList.add('btn', 'btn-sm');
